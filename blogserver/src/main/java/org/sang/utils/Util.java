@@ -11,4 +11,8 @@ public class Util {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return user;
     }
+
+    public static boolean isEmpty(String source) {
+        return source == null || source.length() == 0 || source.trim().length() == 0 || "null".equals(source);
+    }
 }
