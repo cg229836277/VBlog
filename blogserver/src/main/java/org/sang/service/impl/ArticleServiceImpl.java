@@ -1,5 +1,6 @@
 package org.sang.service.impl;
 
+import org.sang.dataobject.ArticleDataObject;
 import org.sang.mongodb.dataobject.ArticleDO;
 import org.sang.mongodb.repository.ArticleRepository;
 import org.sang.service.IArticleService;
@@ -29,5 +30,10 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     public List<ArticleDO> getByType(String type) {
         return articleRepository.getByType(type, collectionName);
+    }
+
+    @Override
+    public ArticleDataObject getByStatus(int status, int pageIndex, int pageSize) {
+        return articleRepository.getByStatus(status, pageIndex, pageSize);
     }
 }

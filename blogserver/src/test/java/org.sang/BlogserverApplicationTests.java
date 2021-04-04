@@ -76,6 +76,7 @@ public class BlogserverApplicationTests {
         articleDO.setTags("flutter");
         articleDO.setTitle("flutter 教程");
         articleDO.setType("blog");
+        articleDO.setStatus(ArticleDO.STATUS_STORED);
 
         // 获得指定用户编号的用户
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
