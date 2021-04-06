@@ -1,7 +1,7 @@
 package org.sang.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.sang.dataobject.ArticleDataObject;
+import org.sang.vo.ArticleDataObject;
 import org.sang.exception.ServiceException;
 import org.sang.exception.ServiceExceptionEnum;
 import org.sang.mongodb.dataobject.ArticleDO;
@@ -59,10 +59,16 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public CommonResult<ArticleDataObject> getArticleByStatus(int status, int pageIndex, int pageSize) {
-        ArticleDataObject data = iArticleService.getByStatus(status, pageIndex, pageSize);
+    public CommonResult<ArticleDataObject> getArticleByStatus(String status, int pageIndex, int pageSize) {
+        int requestStatus = ArticleDO.STATUS_ALL;
+        try {
+            requestStatus = Integer.parseInt(status);
+        } catch (Exception e) {
+            throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
+        }
+        ArticleDataObject data = iArticleService.getByStatus(requestStatus, pageIndex, pageSize);
         if (data == null) {
-            throw new ServiceException(ServiceExceptionEnum.UPDATE_ARTICLE_FAIL);
+            throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
         } else {
             return CommonResult.success(data);
         }

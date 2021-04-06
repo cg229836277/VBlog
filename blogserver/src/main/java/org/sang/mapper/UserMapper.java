@@ -1,35 +1,19 @@
 package org.sang.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
-import org.sang.bean.Role;
-import org.sang.bean.User;
+import org.sang.dataobject.UserDO;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+@Repository
+public interface UserMapper extends BaseMapper<UserDO> {
 
-/**
- * Created by sang on 2017/12/17.
- */
-@Mapper
-public interface UserMapper {
+    default UserDO selectByUsername(@Param("username") String userName) {
+        return selectOne(new QueryWrapper<UserDO>().eq("username", userName));
+    }
 
-    User loadUserByUsername(@Param("username") String username);
-
-    long reg(User user);
-
-    int updateUserEmail(@Param("email") String email, @Param("id") Long id);
-
-    List<User> getUserByNickname(@Param("nickname") String nickname);
-
-    List<Role> getAllRole();
-
-    int updateUserEnabled(@Param("enabled") Boolean enabled, @Param("uid") Long uid);
-
-    int deleteUserById(Long uid);
-
-    int deleteUserRolesByUid(Long id);
-
-    int setUserRoles(@Param("rids") Long[] rids, @Param("id") Long id);
-
-    User getUserById(@Param("id") Long id);
+    default int insertUser(UserDO userDO) {
+        return insert(userDO);
+    }
 }

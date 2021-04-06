@@ -1,86 +1,82 @@
 package org.sang.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.sang.exception.ServiceExceptionEnum;
-import org.sang.service.UserService;
-import org.sang.vo.CommonResult;
+import org.sang.config.filter.ErrorAuthenticationEntryPoint;
+import org.sang.config.filter.TokenFilter;
+import org.sang.config.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.util.DigestUtils;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import javax.annotation.Resource;
 
 /**
  * Created by sang on 2017/12/17.
  */
+@SuppressWarnings("SpringJavaAutowiringInspection")
 @Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    UserService userService;
+
+    @Resource
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Resource
+    private ErrorAuthenticationEntryPoint errorAuthenticationEntryPoint;
+
+    @Resource
+    private TokenFilter tokenFilter;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    public void configureAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+        // 使用 BCryptPasswordEncoder 验证密码
+        auth.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder());
+    }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService);
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        // BCrypt 密码
+        return new BCryptPasswordEncoder();
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-//                .antMatchers("/article").permitAll()
-                .antMatchers("/admin/category/all").authenticated()
-                .antMatchers("/admin/**", "/reg").hasRole("超级管理员")///admin/**的URL都需要有超级管理员角色，如果使用.hasAuthority()方法来配置，需要在参数中加上ROLE_,如下.hasAuthority("ROLE_超级管理员")
-                .anyRequest().authenticated()//其他的路径都是登录后即可访问
-                .and().formLogin().loginPage("/login_page").successHandler(new AuthenticationSuccessHandler() {
-            @Override
-            public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                httpServletResponse.setContentType("application/json;charset=utf-8");
-                PrintWriter out = httpServletResponse.getWriter();
-                out.write(objectMapper.writeValueAsString(CommonResult.success()));
-                out.flush();
-                out.close();
-            }
-        })
-                .failureHandler(new AuthenticationFailureHandler() {
-                    @Override
-                    public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-                        httpServletResponse.setContentType("application/json;charset=utf-8");
-                        PrintWriter out = httpServletResponse.getWriter();
-                        CommonResult errorResult = CommonResult.error(ServiceExceptionEnum.LOGIN_FAILED.getCode(), ServiceExceptionEnum.LOGIN_FAILED.getMessage());
-                        String errorResponse = objectMapper.writeValueAsString(errorResult);
-                        out.write(errorResponse);
-                        out.flush();
-                        out.close();
-                    }
-                }).loginProcessingUrl("/login")
-                .usernameParameter("username").passwordParameter("password").permitAll()
-                .and().logout().permitAll().and().csrf().disable().exceptionHandling().accessDeniedHandler(getAccessDeniedHandler());
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Override
+    public void configure(HttpSecurity httpSecurity) throws Exception {
+        // 配置 CSRF 关闭,允许跨域访问
+        httpSecurity.csrf().disable();
+        // 指定错误未授权访问的处理类
+        httpSecurity.exceptionHandling().authenticationEntryPoint(errorAuthenticationEntryPoint);
+        // 关闭 Session
+        httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        // 允许 登录 注册的 api 的无授权访问，其他需要授权访问
+        httpSecurity.authorizeRequests()
+                .antMatchers("/api/user/login", "/api/user/register")
+                .permitAll().anyRequest().authenticated();
+        // 添加拦截器
+        httpSecurity.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
+        // 禁用缓存
+        httpSecurity.headers().cacheControl();
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/blogimg/**", "/index.html", "/static/**");
+        web.ignoring().antMatchers("/index.html", "/static/**", "/templates/**");
     }
 
-    @Bean
-    AccessDeniedHandler getAccessDeniedHandler() {
-        return new AuthenticationAccessDeniedHandler();
-    }
 }

@@ -1,4 +1,4 @@
-package org.sang.dataobject;
+package org.sang.vo;
 
 import lombok.Data;
 import org.sang.mongodb.dataobject.ArticleDO;

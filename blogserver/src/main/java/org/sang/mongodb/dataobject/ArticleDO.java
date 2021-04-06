@@ -44,14 +44,4 @@ public class ArticleDO extends BaseDO {
      */
     public int status;
 
-    @Transient
-    @JsonSerialize
-    @JsonDeserialize
-    long totalPages;
-
-    @Transient
-    @JsonSerialize
-    @JsonDeserialize
-    long currentPage;
-
 }

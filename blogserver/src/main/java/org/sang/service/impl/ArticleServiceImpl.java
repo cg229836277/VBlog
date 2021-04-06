@@ -1,6 +1,6 @@
 package org.sang.service.impl;
 
-import org.sang.dataobject.ArticleDataObject;
+import org.sang.vo.ArticleDataObject;
 import org.sang.mongodb.dataobject.ArticleDO;
 import org.sang.mongodb.repository.ArticleRepository;
 import org.sang.service.IArticleService;

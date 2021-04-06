@@ -1,6 +1,6 @@
 package org.sang.mongodb.repository;
 
-import org.sang.dataobject.ArticleDataObject;
+import org.sang.vo.ArticleDataObject;
 import org.sang.mongodb.dataobject.ArticleDO;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -30,7 +30,8 @@ public class ArticleRepository extends BaseRepository<ArticleDO> {
         Query articleDynamicQuery = Query.query(Criteria.where("status").is(status));//.with(pageable)
         Sort sort = Sort.by(Sort.Direction.DESC, "publish_date");
         articleDynamicQuery.with(sort);
-        long totalPageSize = mongoTemplate.count(articleDynamicQuery, ArticleDO.class);
+        long totalCount = mongoTemplate.count(articleDynamicQuery, ArticleDO.class);
+        long totalPageSize = totalCount % pageSize == 0 ? totalCount / pageSize : (totalCount / pageSize) + 1;
 
         pageIndex = pageIndex > 0 ? pageIndex : 1;
         pageSize = pageSize > 0 ? pageSize : DEFAULT_PAGE_SIZE;

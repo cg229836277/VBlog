@@ -1,6 +1,6 @@
 package org.sang.service;
 
-import org.sang.dataobject.ArticleDataObject;
+import org.sang.vo.ArticleDataObject;
 import org.sang.mongodb.dataobject.ArticleDO;
 
 import java.util.List;

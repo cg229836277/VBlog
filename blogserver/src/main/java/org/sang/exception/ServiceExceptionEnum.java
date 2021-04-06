@@ -20,6 +20,7 @@ public enum ServiceExceptionEnum {
     USER_DELETED_OR_LOCKED_ERROR(1001002007, "用户已被删除或锁定"),
     MODIFY_DYNAMIC_CODE_ERROR(1001002008, "随机验证码错误"),
     LOGIN_FAILED(1001002009, "登录失败"),
+    REGISTER_FAILED(1001002010, "注册失败"),
 
     //文章处理相关
     SAVE_ARTICLE_FAIL(1001003000, "文章保存失败"),

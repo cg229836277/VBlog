@@ -1,14 +1,15 @@
 package org.sang;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.internal.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sang.bean.User;
+import org.sang.config.utils.StringUtils;
+import org.sang.dataobject.UserDO;
 import org.sang.mongodb.dataobject.ArticleDO;
+import org.sang.vo.ArticleDataObject;
 import org.sang.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 
 @RunWith(SpringRunner.class)
@@ -52,16 +54,44 @@ public class BlogserverApplicationTests {
     public void testLogin() throws Exception {
 //        param("username", "sang")
 //                .param("password", "123")
-        User user = new User();
-        user.setPassword("123");
-        user.setUsername("sang");
+        UserDO userDO = new UserDO();
+        userDO.setPassword("chuckchan");
+        userDO.setUsername("chuck");
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-                .post("/login")
+                .post("/api/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user)));
+                .content(objectMapper.writeValueAsString(userDO)));
         String response = resultActions.andReturn().getResponse().getContentAsString();
         log.info("testLogin response:" + response);
-        resultActions.andExpect(MockMvcResultMatchers.status().isOk()); // 响应状态码 200
+        if (!Utils.isEmpty(response)) {
+            CommonResult<UserDO> commonResult = objectMapper.readValue(response, CommonResult.class);
+            assert (commonResult != null && commonResult.isSuccess() && commonResult.getData() != null);
+            UserDO loginResult = objectMapper.convertValue(commonResult.getData(), UserDO.class);
+            assert (loginResult != null && !StringUtils.isEmpty(loginResult.getToken()));
+        }
+    }
+
+    @Test
+    public void testRegister() throws Exception {
+        UserDO userDO = new UserDO();
+        userDO.setUsername("chuck");
+        userDO.setCreateTime(new Date());
+        userDO.setNickname("chuck");
+        userDO.setEnable(true);
+        userDO.setPassword("chuckchan");
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                .post("/api/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDO)));
+        // 校验结果
+        String response = resultActions.andReturn().getResponse().getContentAsString();
+        log.info("testRegister response:" + response);
+        if (!Utils.isEmpty(response)) {
+            CommonResult<UserDO> commonResult = objectMapper.readValue(response, CommonResult.class);
+            assert (commonResult != null && commonResult.isSuccess() && commonResult.getData() != null);
+            UserDO loginResult = objectMapper.convertValue(commonResult.getData(), UserDO.class);
+            assert (loginResult != null && !StringUtils.isEmpty(loginResult.getToken()));
+        }
     }
 
     @Test
@@ -74,10 +104,12 @@ public class BlogserverApplicationTests {
         articleDO.setSubTitle("flutter demo test");
         articleDO.setSummary("flutter");
         articleDO.setTags("flutter");
-        articleDO.setTitle("flutter 教程");
+        articleDO.setTitle("flutter tutorial");
         articleDO.setType("blog");
-        articleDO.setStatus(ArticleDO.STATUS_STORED);
-
+        Random random = new Random();
+        int randomNum = random.nextInt((ArticleDO.STATUS_ALL - ArticleDO.STATUS_DELETED) + 1) + ArticleDO.STATUS_DELETED;
+        log.info("random status " + randomNum);
+        articleDO.setStatus(randomNum);
         // 获得指定用户编号的用户
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
                 .post("/article/upload")
@@ -122,5 +154,28 @@ public class BlogserverApplicationTests {
                 .content(objectMapper.writeValueAsString(articleDO)));
         // 校验结果
         resultActions.andExpect(MockMvcResultMatchers.status().isOk()); // 响应状态码 200
+    }
+
+    @Test
+    public void testGetByStatus() throws Exception {
+        Random random = new Random();
+        int randomNum = random.nextInt((ArticleDO.STATUS_ALL - ArticleDO.STATUS_DELETED) + 1) + ArticleDO.STATUS_DELETED;
+        log.info("random get status " + randomNum);
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                .get("/article/status")
+                .param("status", "" + randomNum)
+                .param("pageIndex", "1")
+                .param("pageSize", "3"));
+        String response = resultActions.andReturn().getResponse().getContentAsString();
+        log.info("testGetByStatus response:" + response);
+        if (!Utils.isEmpty(response)) {
+            CommonResult<ArticleDataObject> commonResult = (CommonResult<ArticleDataObject>) objectMapper.readValue(response, CommonResult.class);
+            assert (commonResult != null && commonResult.isSuccess() && commonResult.getData() != null);
+            ArticleDataObject articleDataObject = objectMapper.convertValue(commonResult.getData(), ArticleDataObject.class);
+            assert (articleDataObject != null);
+            List<ArticleDO> articleResult = articleDataObject.getArticleDOList();
+            log.info("testGetByStatus result size:" + articleResult.size() + ",pageIndex:" + articleDataObject.getPageIndex() + ",pageSize:" + articleDataObject.getPageSize());
+            assert (articleResult != null && articleResult.size() > 0);
+        }
     }
 }
