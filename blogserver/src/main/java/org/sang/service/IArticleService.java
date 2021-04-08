@@ -12,5 +12,7 @@ public interface IArticleService {
 
     public List<ArticleDO> getByType(String type);
 
+    public ArticleDO getById(String id);
+
     public ArticleDataObject getByStatus(int status, int pageIndx, int pageSize);
 }

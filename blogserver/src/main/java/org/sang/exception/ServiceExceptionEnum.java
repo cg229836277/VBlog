@@ -7,7 +7,7 @@ public enum ServiceExceptionEnum {
     SYS_ERROR(2001001000, "服务端发生异常"),
     MISSING_REQUEST_PARAM_ERROR(2001001001, "参数缺失"),
     AUTHORIZATION_FAIL_ERROR(2001001002, "认证失败"),
-    TOKEN_GENERATE_FAIL_ERROR(2001001003, "认证失败"),
+    TOKEN_GENERATE_FAIL_ERROR(2001001003, "Token生成失败"),
     JSON_PARSE_FAIL_ERROR(2001001004, "json解析失败"),
 
     //用户登录及注册相关
@@ -21,6 +21,8 @@ public enum ServiceExceptionEnum {
     MODIFY_DYNAMIC_CODE_ERROR(1001002008, "随机验证码错误"),
     LOGIN_FAILED(1001002009, "登录失败"),
     REGISTER_FAILED(1001002010, "注册失败"),
+    LOGOUT_FAILED(1001002011, "注销失败"),
+    LOGIN_EXPIRATION(1001002012, "登录过期，请重新登录"),
 
     //文章处理相关
     SAVE_ARTICLE_FAIL(1001003000, "文章保存失败"),

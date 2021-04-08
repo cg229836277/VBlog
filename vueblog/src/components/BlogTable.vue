@@ -40,15 +40,15 @@
       </el-table-column>
       <el-table-column
           label="最近编辑时间" width="140" align="left">
-        <template slot-scope="scope">{{ scope.row.editTime | formatDateTime }}</template>
+        <template slot-scope="scope">{{ scope.row.publish_date | formatDateTime }}</template>
       </el-table-column>
       <el-table-column
-          prop="nickname"
+          prop="author"
           label="作者"
           width="120" align="left">
       </el-table-column>
       <el-table-column
-          prop="cateName"
+          prop="type"
           label="所属分类"
           width="120" align="left">
       </el-table-column>
@@ -72,7 +72,7 @@
     </el-table>
     <div class="blog_table_footer">
       <el-button type="danger" size="mini" style="margin: 0px;" v-show="this.articles.length>0 && showDelete"
-                 :disabled="this.selItems.length==0" @click="deleteMany">批量删除
+                 :disabled="this.selItems.length===0" @click="deleteMany">批量删除
       </el-button>
       <span></span>
       <el-pagination
@@ -88,8 +88,11 @@
 <script>
 import { putRequest } from '../utils/api'
 import { getRequest } from '../utils/api'
-//  import Vue from 'vue'
-//  var bus = new Vue()
+
+const STATUS_ALL = 2
+const STATUS_STORED = 0
+const STATUS_UNFINISHED = 1
+const STATUS_DELETED = -1
 
 export default {
   data () {
@@ -107,15 +110,16 @@ export default {
   mounted: function () {
     var _this = this
     this.loading = true
-    this.loadBlogs(1, this.pageSize)
+    this.loadBlogs()
     window.bus.$on('blogTableReload', function () {
       _this.loading = true
-      _this.loadBlogs(_this.currentPage, _this.pageSize)
+      _this.loadBlogs()
     })
   },
   methods: {
     searchClick () {
-      this.loadBlogs(1, this.pageSize)
+      this.currentPage = 1
+      this.loadBlogs()
     },
     itemClick (row) {
       this.$router.push({ path: '/blogDetail', query: { aid: row.id } })
@@ -131,32 +135,41 @@ export default {
     currentChange (currentPage) {
       this.currentPage = currentPage
       this.loading = true
-      this.loadBlogs(currentPage, this.pageSize)
+      this.loadBlogs()
     },
-    loadBlogs (page, count) {
+    loadBlogs () {
       var _this = this
-      var url = ''
-      if (this.state == -2) {
-        url = '/admin/article/all' + '?page=' + page + '&count=' + count + '&keywords=' + this.keywords
-      } else {
-        url = '/article/all?state=' + this.state + '&page=' + page + '&count=' + count + '&keywords=' + this.keywords
+      let url = '/article/status'
+      var status = STATUS_ALL
+      console.log('current state is ' + this.state)
+      if (this.state == -1) {
+        status = STATUS_ALL
+      } else if (this.state == 1) {
+        status = STATUS_STORED
+      } else if (this.state == 0) {
+        status = STATUS_UNFINISHED
+      } else if (this.state == 2) {
+        status = STATUS_DELETED
       }
-      getRequest(url).then(resp => {
+      console.log('current status is ' + status)
+      getRequest(url, { status: status, pageIndex: _this.currentPage, pageSize: _this.pageSize }).then(response => {
         _this.loading = false
-        if (resp.status == 200) {
-          _this.articles = resp.data.articles
-          _this.totalCount = resp.data.totalCount
+        let articleJson = response.data
+        if (articleJson != null && articleJson.code === 0) {
+          let articleData = articleJson.data.articleDOList
+          _this.articles = articleData
+          _this.totalCount = articleData.pageSize
         } else {
           _this.$message({ type: 'error', message: '数据加载失败!' })
         }
-      }, resp => {
+      }, response => {
         _this.loading = false
-        if (resp.response.status == 403) {
-          _this.$message({ type: 'error', message: resp.response.data })
+        if (response.response.status === 403) {
+          _this.$message({ type: 'error', message: response.response.data })
         } else {
           _this.$message({ type: 'error', message: '数据加载失败!' })
         }
-      }).catch(resp => {
+      }).catch(_ => {
         //压根没见到服务器
         _this.loading = false
         _this.$message({ type: 'error', message: '数据加载失败!' })
@@ -181,10 +194,10 @@ export default {
       }).then(() => {
         _this.loading = true
         putRequest('/article/restore', { articleId: row.id }).then(resp => {
-          if (resp.status == 200) {
+          if (resp.status === 200) {
             var data = resp.data
             _this.$message({ type: data.status, message: data.msg })
-            if (data.status == 'success') {
+            if (data.status === 'success') {
               window.bus.$emit('blogTableReload')//通过选项卡都重新加载数据
             }
           } else {
@@ -201,23 +214,23 @@ export default {
     },
     deleteToDustBin (state) {
       var _this = this
-      this.$confirm(state != 2 ? '将该文件放入回收站，是否继续?' : '永久删除该文件, 是否继续?', '提示', {
+      this.$confirm(state !== 2 ? '将该文件放入回收站，是否继续?' : '永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         _this.loading = true
         var url = ''
-        if (_this.state == -2) {
+        if (_this.state === -2) {
           url = '/admin/article/dustbin'
         } else {
           url = '/article/dustbin'
         }
         putRequest(url, { aids: _this.dustbinData, state: state }).then(resp => {
-          if (resp.status == 200) {
+          if (resp.status === 200) {
             var data = resp.data
             _this.$message({ type: data.status, message: data.msg })
-            if (data.status == 'success') {
+            if (data.status === 'success') {
               window.bus.$emit('blogTableReload')//通过选项卡都重新加载数据
             }
           } else {

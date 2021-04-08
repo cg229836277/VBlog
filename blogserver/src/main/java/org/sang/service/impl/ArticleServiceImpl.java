@@ -36,4 +36,9 @@ public class ArticleServiceImpl implements IArticleService {
     public ArticleDataObject getByStatus(int status, int pageIndex, int pageSize) {
         return articleRepository.getByStatus(status, pageIndex, pageSize);
     }
+
+    @Override
+    public ArticleDO getById(String id) {
+        return articleRepository.getById(id);
+    }
 }

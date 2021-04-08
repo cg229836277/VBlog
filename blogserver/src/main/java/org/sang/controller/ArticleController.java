@@ -38,6 +38,16 @@ public class ArticleController {
         }
     }
 
+    @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
+    public CommonResult<ArticleDO> getArticleById(@PathVariable String id) {
+        ArticleDO data = iArticleService.getById(id);
+        if (data == null) {
+            throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
+        } else {
+            return CommonResult.success(data);
+        }
+    }
+
     @RequestMapping(value = "/{type}", method = RequestMethod.GET)
     public CommonResult<List<ArticleDO>> getArticleByType(@PathVariable String type) {
         List<ArticleDO> data = iArticleService.getByType(type);
@@ -59,14 +69,19 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public CommonResult<ArticleDataObject> getArticleByStatus(String status, int pageIndex, int pageSize) {
-        int requestStatus = ArticleDO.STATUS_ALL;
+    public CommonResult<ArticleDataObject> getArticleByStatus(String status, String pageIndex, String pageSize) {
+        log.info("status:" + status + ",pageIndex:" + pageIndex + ",pageSize:" + pageSize);
+        int defaultStatus = ArticleDO.STATUS_ALL;
+        int defaultPageIndex = 1, defaultPageSize = 8;
         try {
-            requestStatus = Integer.parseInt(status);
+            defaultStatus = Integer.parseInt(status);
+            defaultPageIndex = Integer.parseInt(pageIndex);
+            defaultPageSize = Integer.parseInt(pageSize);
         } catch (Exception e) {
-            throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
+            e.printStackTrace();
         }
-        ArticleDataObject data = iArticleService.getByStatus(requestStatus, pageIndex, pageSize);
+        log.info("defaultStatus:" + defaultStatus + ",defaultPageIndex:" + defaultPageIndex + ",defaultPageSize:" + defaultPageSize);
+        ArticleDataObject data = iArticleService.getByStatus(defaultStatus, defaultPageIndex, defaultPageSize);
         if (data == null) {
             throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
         } else {

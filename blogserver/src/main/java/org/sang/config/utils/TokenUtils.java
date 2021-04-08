@@ -28,10 +28,8 @@ public class TokenUtils implements Serializable {
     private String tokenSignKey;
 
     private static final long serialVersionUID = -3L;
-    /**
-     * Token 有效时长
-     */
-    private static final Long EXPIRATION = 604800L;
+
+    private final static Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     /**
      * 生成 Token 字符串 必须 setAudience 接收者 setExpiration 过期时间 role 用户角色
@@ -44,7 +42,6 @@ public class TokenUtils implements Serializable {
             log.info("tokenSignKey:" + tokenSignKey + ",tokenExpiration:" + tokenExpiration);
             // Token 的过期时间
             Date expirationDate = new Date(System.currentTimeMillis() + tokenExpiration * 1000);
-            Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
             // 生成 Token
             String token = Jwts.builder()
                     // 设置 Token 签发者 可选
@@ -57,6 +54,7 @@ public class TokenUtils implements Serializable {
                     .setIssuedAt(new Date())
                     // 通过 claim 方法设置一个 key = role，value = userRole 的值
                     .claim("role", roleName)
+                    .claim("password", userDO.getPassword())
                     // 设置加密密钥和加密算法，注意要用私钥加密且保证私钥不泄露
                     .signWith(key)
                     .compressWith(CompressionCodecs.GZIP)
@@ -78,7 +76,6 @@ public class TokenUtils implements Serializable {
         try {
 //            String user = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token).getBody().getSubject();
             // 解密 Token，获取 Claims 主体
-            Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
             Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
             assert claims != null;
             // 验证 Token 有没有过期 过期时间
@@ -90,6 +87,7 @@ public class TokenUtils implements Serializable {
             UserDO userDO = new UserDO();
             userDO.setUsername(claims.getAudience());
             userDO.setRoleName(claims.get("role").toString());
+            userDO.setPassword(claims.get("password").toString());
             return userDO;
         } catch (Exception e) {
             e.printStackTrace();

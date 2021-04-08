@@ -58,6 +58,8 @@
 </template>
 <script>
 import { getRequest } from '../utils/api'
+import { SET_USER } from '../store/actions'
+import { GET_USER } from '../store/actions'
 
 export default {
   methods: {
@@ -71,6 +73,7 @@ export default {
         }).then(function () {
           getRequest('/logout')
           _this.currentUserName = '游客'
+          _this.$store.commit(SET_USER, {})
           _this.$router.replace({ path: '/' })
         }, function () {
           //取消
@@ -79,17 +82,9 @@ export default {
     }
   },
   mounted: function () {
-    // this.$alert('为了确保所有的小伙伴都能看到完整的数据演示，数据库只开放了查询权限和部分字段的更新权限，其他权限都不具备，完整权限的演示需要大家在自己本地部署后，换一个正常的数据库用户后即可查看，这点请大家悉知!', '友情提示', {
-    //   confirmButtonText: '确定',
-    //   callback: action => {
-    //   }
-    // })
     var _this = this
-    getRequest('/currentUserName').then(function (msg) {
-      _this.currentUserName = msg.data
-    }, function (msg) {
-      _this.currentUserName = '游客'
-    })
+    var user = this.$store.getters.getUser
+    _this.currentUserName = user.username
   },
   data () {
     return {

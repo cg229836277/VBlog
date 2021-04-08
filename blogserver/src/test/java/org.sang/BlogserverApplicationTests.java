@@ -51,6 +51,23 @@ public class BlogserverApplicationTests {
     }
 
     @Test
+    public void testFormLogin() throws Exception {
+        UserDO userDO = new UserDO();
+        userDO.setPassword("chuckchan");
+        userDO.setUsername("chuck");
+
+        String body = "{\"username\":\"chuck\",\"password\":\"chuckchan\"}";
+        log.info("testFormLogin body:" + body);
+
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                .post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body));
+        String response = resultActions.andReturn().getResponse().getContentAsString();
+        log.info("testFormLogin response:" + response);
+    }
+
+    @Test
     public void testLogin() throws Exception {
 //        param("username", "sang")
 //                .param("password", "123")
@@ -60,6 +77,7 @@ public class BlogserverApplicationTests {
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
                 .post("/api/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
+//                .header("token", "eyJhbGciOiJIUzI1NiIsInppcCI6IkdaSVAifQ.H4sIAAAAAAAAAKtWyiwuVrJSKitNTcrJT1fSUUosTQHykzNKk7OBvNSKAiUrQzMjQ2MzQzNDUx2lzMQSkIChuTlUoCg_JxWowdHF19NPqRYAYK-x-1AAAAA.0HGOj3MnUsEkghrwPZOnFbM_gtZnxE_NTd9j0Wiojk8")
                 .content(objectMapper.writeValueAsString(userDO)));
         String response = resultActions.andReturn().getResponse().getContentAsString();
         log.info("testLogin response:" + response);
@@ -68,6 +86,20 @@ public class BlogserverApplicationTests {
             assert (commonResult != null && commonResult.isSuccess() && commonResult.getData() != null);
             UserDO loginResult = objectMapper.convertValue(commonResult.getData(), UserDO.class);
             assert (loginResult != null && !StringUtils.isEmpty(loginResult.getToken()));
+        }
+    }
+
+    @Test
+    public void testLogout() throws Exception {
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                .get("/logout")
+                .header("token", "eyJhbGciOiJIUzI1NiIsInppcCI6IkdaSVAifQ.H4sIAAAAAAAAAKtWyiwuVrJSKitNTcrJT1fSUUosTQHykzNKk7OBvNSKAiUrQzMjQ2MzQzNDUx2lzMQSkIChuTlUoCg_JxWowdHF19NPqRYAYK-x-1AAAAA.0HGOj3MnUsEkghrwPZOnFbM_gtZnxE_NTd9j0Wiojk8"));
+        String response = resultActions.andReturn().getResponse().getContentAsString();
+        log.info("testLogout response:" + response);
+        assert (!StringUtils.isEmpty(response));
+        if (!Utils.isEmpty(response)) {
+            CommonResult commonResult = objectMapper.readValue(response, CommonResult.class);
+            assert (commonResult != null && commonResult.isSuccess());
         }
     }
 

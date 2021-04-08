@@ -1,5 +1,6 @@
 package org.sang.config.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.sang.dataobject.RoleDO;
 import org.sang.dataobject.UserDO;
 import org.sang.mapper.RoleMapper;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class UserDetailsServiceImpl implements UserDetailsService {
     @Resource
     private UserMapper userMapper;
@@ -36,6 +38,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // 可以通过增加用户角色表、用户--角色映射表，存储多个用户角色信息
         authorities.add(new SimpleGrantedAuthority("ROLE_" + (roleDO == null ? RoleDO.ROLE_NORMAL : roleDO.getName())));
         // 给 Spring Security 传入用户名、用户密码、用户角色。
+        log.info("UserDetails ps:" + userDO.getPassword());
         return new User(userDO.getUsername(), userDO.getPassword(), authorities);
     }
 }

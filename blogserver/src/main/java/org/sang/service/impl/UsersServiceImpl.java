@@ -13,7 +13,6 @@ import org.sang.mapper.RoleUserMapper;
 import org.sang.mapper.UserMapper;
 import org.sang.service.IUsersService;
 import org.sang.vo.CommonResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,7 +39,7 @@ public class UsersServiceImpl extends ServiceImpl<UserMapper, UserDO> implements
     @Resource
     private TokenUtils tokenUtils;
 
-    @Autowired
+    @Resource
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -60,7 +59,7 @@ public class UsersServiceImpl extends ServiceImpl<UserMapper, UserDO> implements
             System.out.println(userDO.getUsername());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userDO.getUsername(),
-                            userDO.getPassword()));
+                            passwordEncoder.encode(userDO.getPassword())));
         } catch (BadCredentialsException e) {
             throw new ServiceException(ServiceExceptionEnum.LOGIN_USER_PASSWORD_ERROR);
         }
@@ -71,6 +70,7 @@ public class UsersServiceImpl extends ServiceImpl<UserMapper, UserDO> implements
         String token = tokenUtils.createToken(userDO1, roleDO.getName());
         userDO1.setRoleName(roleDO == null ? RoleDO.ROLE_NORMAL : roleDO.getName());
         userDO1.setToken(token);
+        userDO1.setPassword("");
         return CommonResult.success(userDO1);
     }
 
@@ -97,7 +97,7 @@ public class UsersServiceImpl extends ServiceImpl<UserMapper, UserDO> implements
             roleUserDO.setRoleId(roleDO.getId());
             roleUserDO.setUserId(userId);
             roleUserMapper.insertRoleUserDO(roleUserDO);
-
+            userDO.setPassword("");
             return CommonResult.success(userDO);
         } catch (Exception e) {
             e.printStackTrace();

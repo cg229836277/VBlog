@@ -1,5 +1,7 @@
 package org.sang.config.filter;
 
+import lombok.extern.slf4j.Slf4j;
+import org.sang.config.utils.StringUtils;
 import org.sang.config.utils.TokenUtils;
 import org.sang.dataobject.RoleDO;
 import org.sang.dataobject.UserDO;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @Service
+@Slf4j
 public class TokenFilter extends OncePerRequestFilter {
 
     @Resource
@@ -31,18 +34,14 @@ public class TokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         // 存储 Token 的 Headers Key与 Value，默认是 Authorization
-        final String authorizationKey = "Authorization";
-        String authorizationValue;
+        final String tokenKey = "token";
+        String token;
         try {
-            authorizationValue = request.getHeader(authorizationKey);
+            token = request.getHeader(tokenKey);
         } catch (Exception e) {
-            authorizationValue = null;
+            token = null;
         }
-        // Token 开头部分 默认 Bearer 开头
-        String bearer = "Bearer ";
-        if (authorizationValue != null && authorizationValue.startsWith(bearer)) {
-            // token
-            String token = authorizationValue.substring(bearer.length());
+        if (!StringUtils.isEmpty(token)) {
             UserDO userDO = tokenUtils.validationToken(token);
             if (userDO != null) {
                 // Spring Security 角色名称默认使用 "ROLE_" 开头
@@ -58,7 +57,7 @@ public class TokenFilter extends OncePerRequestFilter {
                 // 传入用户名、用户密码、用户角色。 这里的密码随便写的，用不上
                 UserDetails userDetails = new User(userDO.getUsername(), userDO.getPassword(), authorities);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                        userDetails, null, authorities);
                 authentication.setDetails(userDetails.getUsername());
                 // 授权
                 SecurityContextHolder.getContext().setAuthentication(authentication);

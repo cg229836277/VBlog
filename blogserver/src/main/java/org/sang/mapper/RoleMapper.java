@@ -18,6 +18,6 @@ public interface RoleMapper extends BaseMapper<RoleDO> {
         return selectOne(new QueryWrapper<RoleDO>().eq("name", name));
     }
 
-    @Select("SELECT * FROM roles r LEFT JOIN roles_users r_u ON r.id = r_u.uid WHERE r_u.uid = #{userId}")
+    @Select("SELECT * FROM roles r LEFT JOIN roles_users r_u ON r.id = r_u.rid WHERE r_u.uid = #{userId}")
     RoleDO selectByUserId(@Param("userId") long userId);
 }

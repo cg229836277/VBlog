@@ -15,6 +15,12 @@ public class ArticleRepository extends BaseRepository<ArticleDO> {
 
     private final String collectionName = "article";
 
+    public ArticleDO getById(String id) {
+        Query articleQuery = Query.query(Criteria.where("_id").is(Long.parseLong(id)));
+        ArticleDO items = mongoTemplate.findOne(articleQuery, ArticleDO.class, collectionName);
+        return items;
+    }
+
     public ArticleDataObject getByStatus(int status, int pageIndex, int pageSize) {
         if (status == ArticleDO.STATUS_ALL) {
             List<ArticleDO> items = mongoTemplate.findAll(ArticleDO.class, collectionName);
@@ -29,6 +35,7 @@ public class ArticleRepository extends BaseRepository<ArticleDO> {
         }
         Query articleDynamicQuery = Query.query(Criteria.where("status").is(status));//.with(pageable)
         Sort sort = Sort.by(Sort.Direction.DESC, "publish_date");
+        articleDynamicQuery.fields().include("author").include("title").include("type").include("publish_date");
         articleDynamicQuery.with(sort);
         long totalCount = mongoTemplate.count(articleDynamicQuery, ArticleDO.class);
         long totalPageSize = totalCount % pageSize == 0 ? totalCount / pageSize : (totalCount / pageSize) + 1;

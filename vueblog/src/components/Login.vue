@@ -16,6 +16,8 @@
 </template>
 <script>
 import { postRequest } from '../utils/api'
+import { SET_USER } from '../store/actions'
+import axios from 'axios'
 
 export default {
   data () {
@@ -27,7 +29,7 @@ export default {
       checked: true,
       loginForm: {
         username: 'chuck',
-        password: '123'
+        password: 'chuckchan',
       },
       loading: false
     }
@@ -41,10 +43,11 @@ export default {
         password: this.loginForm.password
       }).then(resp => {
         _this.loading = false
-        if (resp.status == 200) {
+        if (resp.status === 200) {
           //成功
           var json = resp.data
-          if (json.code == 0) {
+          if (json.code === 0) {
+            _this.$store.commit(SET_USER, json.data)
             _this.$router.replace({ path: '/home' })
           } else {
             _this.$alert('登录失败!', '失败!')
@@ -52,8 +55,10 @@ export default {
         } else {
           //失败
           _this.$alert('登录失败!', '失败!')
+          _this.$store.commit(SET_USER, {})
         }
       }, resp => {
+        _this.$store.commit(SET_USER, {})
         _this.loading = false
         _this.$alert('找不到服务器⊙﹏⊙∥!', '失败!')
       })

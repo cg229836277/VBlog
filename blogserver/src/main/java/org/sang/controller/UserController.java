@@ -1,6 +1,7 @@
 package org.sang.controller;
 
 import org.sang.dataobject.UserDO;
+import org.sang.exception.ServiceExceptionEnum;
 import org.sang.service.IUsersService;
 import org.sang.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ public class UserController {
 
     @Autowired
     IUsersService userService;
+
+    @RequestMapping("/login_page")
+    public CommonResult loginPage() {
+        return CommonResult.error(ServiceExceptionEnum.LOGIN_FAILED.getCode(), ServiceExceptionEnum.LOGIN_FAILED.getMessage());
+    }
 
     /**
      * 用户登录接口
