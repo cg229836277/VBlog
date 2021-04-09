@@ -1,44 +1,48 @@
 <template>
   <el-container v-loading="loading" class="post-article">
     <el-header class="header">
-      <el-select v-model="article.cid" placeholder="请选择文章栏目" style="width: 150px;">
-        <el-option
-          v-for="item in categories"
-          :key="item.id"
-          :label="item.cateName"
-          :value="item.id">
-        </el-option>
+      <el-select v-model="article.type" placeholder="请选择文章栏目" style="width: 150px;">
+        <el-option-group
+            v-for="(item, index) in categoryParent"
+            :key="item"
+            :label="item">
+          <el-option
+              v-for="itemValue in categoryChild[index]"
+              :key="itemValue"
+              :label="itemValue"
+              :value="itemValue">
+          </el-option>
+        </el-option-group>
       </el-select>
       <el-input v-model="article.title" placeholder="请输入标题..." style="width: 400px;margin-left: 10px"></el-input>
       <el-tag
-        :key="tag"
-        v-for="tag in article.dynamicTags"
-        closable
-        :disable-transitions="false"
-        @close="handleClose(tag)" style="margin-left: 10px">
-        {{tag}}
+          :key="tag"
+          v-for="tag in article.dynamicTags"
+          closable
+          :disable-transitions="false"
+          @close="handleClose(tag)" style="margin-left: 10px">
+        {{ tag }}
       </el-tag>
       <el-input
-        class="input-new-tag"
-        v-if="tagInputVisible"
-        v-model="tagValue"
-        ref="saveTagInput"
-        size="small"
-        @keyup.enter.native="handleInputConfirm"
-        @blur="handleInputConfirm">
+          class="input-new-tag"
+          v-if="tagInputVisible"
+          v-model="tagValue"
+          ref="saveTagInput"
+          size="small"
+          @keyup.enter.native="handleInputConfirm"
+          @blur="handleInputConfirm">
       </el-input>
       <el-button v-else class="button-new-tag" type="primary" size="small" @click="showInput">+Tag</el-button>
     </el-header>
     <el-main class="main">
       <div id="editor">
-        <mavon-editor style="height: 100%;width: 100%;" ref=md @imgAdd="imgAdd"
-                      @imgDel="imgDel" v-model="article.mdContent"></mavon-editor>
+        <mavon-editor style="height: 100%;width: 100%;" ref=md v-model="article.mdContent"></mavon-editor>
       </div>
       <div style="display: flex;align-items: center;margin-top: 15px;justify-content: flex-end">
         <el-button @click="cancelEdit" v-if="from!=undefined">放弃修改</el-button>
         <template v-if="from==undefined || from=='draft'">
-          <el-button @click="saveBlog(0)">保存到草稿箱</el-button>
-          <el-button type="primary" @click="saveBlog(1)">发表文章</el-button>
+          <el-button @click="saveBlog(1)">保存到草稿箱</el-button>
+          <el-button type="primary" @click="saveBlog(0)">发表文章</el-button>
         </template>
         <template v-else="from==post">
           <el-button type="primary" @click="saveBlog(1)">保存修改</el-button>
@@ -48,186 +52,237 @@
   </el-container>
 </template>
 <script>
-  import {postRequest} from '../utils/api'
-  import {putRequest} from '../utils/api'
-  import {deleteRequest} from '../utils/api'
-  import {getRequest} from '../utils/api'
-  import {uploadFileRequest} from '../utils/api'
-  // Local Registration
-  import {mavonEditor} from 'mavon-editor'
-  // 可以通过 mavonEditor.markdownIt 获取解析器markdown-it对象
-  import 'mavon-editor/dist/css/index.css'
-  import {isNotNullORBlank} from '../utils/utils'
+import { postRequest } from '../utils/api'
+import { getRequest } from '../utils/api'
+import { mavonEditor } from 'mavon-editor'
+// 可以通过 mavonEditor.markdownIt 获取解析器markdown-it对象
+import 'mavon-editor/dist/css/index.css'
+import { isNotNullORBlank } from '../utils/utils'
 
-  export default {
-    mounted: function () {
-      this.getCategories();
-      var from = this.$route.query.from;
-      this.from = from;
-      var _this = this;
-      if (from != null && from != '' && from != undefined) {
-        var id = this.$route.query.id;
-        this.id = id;
-        this.loading = true;
-        getRequest("/article/" + id).then(resp=> {
-          _this.loading = false;
-          if (resp.status == 200) {
-            _this.article = resp.data;
-            var tags = resp.data.tags;
-            _this.article.dynamicTags = []
-            for (var i = 0; i < tags.length; i++) {
-              _this.article.dynamicTags.push(tags[i].tagName)
-            }
-          } else {
-            _this.$message({type: 'error', message: '页面加载失败!'})
+import { STATUS_STORED } from '../constant/status'
+
+export default {
+  mounted: function () {
+    this.getCategories()
+    var from = this.$route.query.from
+    this.from = from
+    var _this = this
+    if (from != null && from != '' && from != undefined) {
+      var id = this.$route.query.id
+      this.id = id
+      this.loading = true
+      getRequest('/article/id/' + id).then(resp => {
+        _this.loading = false
+        let jsonData = resp.data
+        if (jsonData && jsonData.code == 0) {
+          let articleData = jsonData.data
+          _this.article.mdContent = articleData.content
+          _this.article.title = articleData.title
+          _this.article.category_id = articleData.category_id
+          _this.article.category_name = articleData.type
+          _this.article.create_time = articleData.create_time
+          _this.article.dynamicTags = []
+
+          let tags = articleData.tags
+          let length = tags.length
+          for (var i = 0; i < length; i++) {
+            _this.article.dynamicTags.push(tags[i])
           }
-        }, resp=> {
-          _this.loading = false;
-          _this.$message({type: 'error', message: '页面加载失败!'})
-        })
+        } else {
+          _this.$message({ type: 'error', message: '页面加载失败!' })
+        }
+      }, resp => {
+        _this.loading = false
+        _this.$message({ type: 'error', message: '页面加载失败!' })
+      })
+    }
+  },
+  components: {
+    mavonEditor
+  },
+  methods: {
+    cancelEdit () {
+      this.$router.go(-1)
+    },
+    saveBlog (state) {
+      if (!(isNotNullORBlank(this.article.title, this.article.mdContent))) {
+        this.$message({ type: 'error', message: '数据不能为空!' })
+        return
+      }
+      var _this = this
+      _this.loading = true
+      postRequest('/article/upload', {
+        title: _this.article.title,
+        content: state == STATUS_STORED ? _this.$refs.md.d_render : _this.article.mdContent,
+        // htmlContent: _this.$refs.md.d_render,
+        status: state,
+        tags: _this.article.dynamicTags,
+        author: _this.$store.getters.getUserName,
+        publish_date: _this.formatDate(new Date()),
+        type: _this.article.type,
+        create_time: _this.article.create_time.length > 0 ? _this.article.create_time : _this.formatDate(new Date()),
+        category_id: this.getCategoryId(),
+      }).then(resp => {
+        _this.loading = false
+        let jsonData = resp.data
+        console.log('saveBlog:' + jsonData)
+        if (jsonData && jsonData.code == 0) {
+          _this.$message({ type: 'success', message: state == 0 ? '保存成功!' : '发布成功!' })
+          window.bus.$emit('blogTableReload')
+          _this.$router.replace({ path: '/articleList' })
+        } else {
+          _this.$message({ type: 'error', message: state == 0 ? '保存草稿失败!' : '博客发布失败!' })
+        }
+      }, resp => {
+        _this.loading = false
+        _this.$message({ type: 'error', message: state == 0 ? '保存草稿失败!' : '博客发布失败!' })
+      })
+    },
+    getCategories () {
+      var _this = this
+      getRequest('/article/categories').then(resp => {
+        let jsonData = resp.data
+        if (jsonData != null && jsonData.code == 0) {
+          _this.categories = jsonData.data
+          _this.setCategoryMap()
+        } else {
+          _this.$message({ type: 'error', message: '获取文章类型失败' })
+        }
+      })
+    },
+    handleClose (tag) {
+      this.article.dynamicTags.splice(this.article.dynamicTags.indexOf(tag), 1)
+    },
+    showInput () {
+      this.tagInputVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    handleInputConfirm () {
+      var _this = this
+      let tagValue = _this.tagValue
+      if (tagValue) {
+        _this.article.dynamicTags.push(tagValue)
+      }
+      _this.tagInputVisible = false
+      _this.tagValue = ''
+    },
+    getCategoryId () {
+      var _this = this
+      let length = _this.categories.length
+      for (var index = 0; index < length; index++) {
+        let item = _this.categories[index]
+        if (item.childName == _this.article.type) {
+          return item.id
+        }
       }
     },
-    components: {
-      mavonEditor
-    },
-    methods: {
-      cancelEdit(){
-        this.$router.go(-1)
-      },
-      saveBlog(state){
-        if (!(isNotNullORBlank(this.article.title, this.article.mdContent, this.article.cid))) {
-          this.$message({type: 'error', message: '数据不能为空!'});
-          return;
+    setCategoryMap () {
+      var _this = this
+      let categoryMap = new Map()
+      let length = _this.categories.length
+      for (var index = 0; index < length; index++) {
+        var categoryItem = _this.categories[index]
+        let parentName = categoryItem.parentName
+        let childName = categoryItem.childName
+        console.log(parentName + ':' + childName)
+        if (categoryMap.get(parentName)) {
+          let itemArray = categoryMap.get(parentName)
+          itemArray.push(childName)
+          categoryMap.set(parentName, itemArray)
+        } else {
+          let itemArray = []
+          itemArray.push(childName)
+          categoryMap.set(parentName, itemArray)
         }
-        var _this = this;
-        _this.loading = true;
-        postRequest("/article/", {
-          id: _this.article.id,
-          title: _this.article.title,
-          mdContent: _this.article.mdContent,
-          htmlContent: _this.$refs.md.d_render,
-          cid: _this.article.cid,
-          state: state,
-          dynamicTags: _this.article.dynamicTags
-        }).then(resp=> {
-          _this.loading = false;
-          if (resp.status == 200 && resp.data.status == 'success') {
-            _this.article.id = resp.data.msg;
-            _this.$message({type: 'success', message: state == 0 ? '保存成功!' : '发布成功!'});
-//            if (_this.from != undefined) {
-            window.bus.$emit('blogTableReload')
-//            }
-            if (state == 1) {
-              _this.$router.replace({path: '/articleList'});
-            }
-          }
-        }, resp=> {
-          _this.loading = false;
-          _this.$message({type: 'error', message: state == 0 ? '保存草稿失败!' : '博客发布失败!'});
-        })
-      },
-      imgAdd(pos, $file){
-        var _this = this;
-        // 第一步.将图片上传到服务器.
-        var formdata = new FormData();
-        formdata.append('image', $file);
-        uploadFileRequest("/article/uploadimg", formdata).then(resp=> {
-          var json = resp.data;
-          if (json.status == 'success') {
-//            _this.$refs.md.$imgUpdateByUrl(pos, json.msg)
-            _this.$refs.md.$imglst2Url([[pos, json.msg]])
-          } else {
-            _this.$message({type: json.status, message: json.msg});
-          }
-        });
-      },
-      imgDel(pos){
-
-      },
-      getCategories(){
-        let _this = this;
-        getRequest("/admin/category/all").then(resp=> {
-          _this.categories = resp.data;
-        });
-      },
-      handleClose(tag) {
-        this.article.dynamicTags.splice(this.article.dynamicTags.indexOf(tag), 1);
-      },
-      showInput() {
-        this.tagInputVisible = true;
-        this.$nextTick(_ => {
-          this.$refs.saveTagInput.$refs.input.focus();
-        });
-      },
-      handleInputConfirm() {
-        let tagValue = this.tagValue;
-        if (tagValue) {
-          this.article.dynamicTags.push(tagValue);
-        }
-        this.tagInputVisible = false;
-        this.tagValue = '';
       }
+      this.categoryParent = Array.from(categoryMap.keys())
+      this.categoryChild = Array.from(categoryMap.values())
+      console.log('categoryMap values:' + this.categoryChild)
+      console.log('categoryMap keys:' + this.categoryParent)
     },
-    data() {
-      return {
-        categories: [],
-        tagInputVisible: false,
-        tagValue: '',
-        loading: false,
-        from: '',
-        article: {
-          id: '-1',
-          dynamicTags: [],
-          title: '',
-          mdContent: '',
-          cid: ''
-        }
+    formatDate (date) {
+      let year = date.getFullYear()
+      let month = date.getMonth() + 1
+      let day = date.getDate()
+      let hours = date.getHours()
+      let minutes = date.getMinutes()
+      let seconds = date.getSeconds()
+      if (month < 10) {
+        month = '0' + month
+      }
+      if (day < 10) {
+        day = '0' + day
+      }
+      return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds
+    }
+  }
+  ,
+  data () {
+    return {
+      categories: [],
+      categoryParent: [],
+      categoryChild: [],
+      tagValue: '',
+      loading: false,
+      from: '',
+      tagInputVisible: true,
+      article: {
+        dynamicTags: [],
+        title: '',
+        mdContent: '',
+        create_time: '',
+        category_id: '',
+        category_name: '',
+        type: '',
       }
     }
   }
+}
 </script>
 <style>
-  .post-article > .main > #editor {
-    width: 100%;
-    height: 450px;
-    text-align: left;
-  }
+.post-article > .main > #editor {
+  width: 100%;
+  height: 450px;
+  text-align: left;
+}
 
-  .post-article > .header {
-    background-color: #ececec;
-    margin-top: 10px;
-    padding-left: 5px;
-    display: flex;
-    justify-content: flex-start;
-  }
+.post-article > .header {
+  background-color: #ececec;
+  margin-top: 10px;
+  padding-left: 5px;
+  display: flex;
+  justify-content: flex-start;
+}
 
-  .post-article > .main {
-    /*justify-content: flex-start;*/
-    display: flex;
-    flex-direction: column;
-    padding-left: 5px;
-    background-color: #ececec;
-    padding-top: 0px;
-  }
+.post-article > .main {
+  /*justify-content: flex-start;*/
+  display: flex;
+  flex-direction: column;
+  padding-left: 5px;
+  background-color: #ececec;
+  padding-top: 0px;
+}
 
-  .post-article > .header > .el-tag + .el-tag {
-    margin-left: 10px;
-  }
+.post-article > .header > .el-tag + .el-tag {
+  margin-left: 10px;
+}
 
-  .post-article > .header > .button-new-tag {
-    margin-left: 10px;
-    height: 32px;
-    line-height: 30px;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
+.post-article > .header > .button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
 
-  .post-article > .header > .input-new-tag {
-    width: 90px;
-    margin-left: 10px;
-    vertical-align: bottom;
-  }
+.post-article > .header > .input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
+}
 
-  .post-article {
-  }
+.post-article {
+}
 </style>

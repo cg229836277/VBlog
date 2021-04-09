@@ -88,11 +88,10 @@
 <script>
 import { putRequest } from '../utils/api'
 import { getRequest } from '../utils/api'
-
-const STATUS_ALL = 2
-const STATUS_STORED = 0
-const STATUS_UNFINISHED = 1
-const STATUS_DELETED = -1
+import { STATUS_ALL } from '../constant/status'
+import { STATUS_STORED } from '../constant/status'
+import { STATUS_UNFINISHED } from '../constant/status'
+import { STATUS_DELETED } from '../constant/status'
 
 export default {
   data () {
@@ -141,7 +140,7 @@ export default {
       var _this = this
       let url = '/article/status'
       var status = STATUS_ALL
-      console.log('current state is ' + this.state)
+      // console.log('current state is ' + this.state)
       if (this.state == -1) {
         status = STATUS_ALL
       } else if (this.state == 1) {

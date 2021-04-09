@@ -2,8 +2,12 @@
   <el-container>
     <el-header class="cate_mana_header">
       <el-input
-        placeholder="请输入栏目名称"
-        v-model="cateName" style="width: 200px;">
+        placeholder="请输入父一级栏目名称"
+        v-model="parentName" style="width: 200px;">
+      </el-input>
+      <el-input
+          placeholder="请输入子一级栏目名称"
+          v-model="childName" style="width: 200px;">
       </el-input>
       <el-button type="primary" size="medium" style="margin-left: 10px" @click="addNewCate">新增栏目</el-button>
     </el-header>
@@ -24,9 +28,14 @@
           width="120" align="left">
         </el-table-column>
         <el-table-column
-          label="栏目名称"
+          label="父栏目名称"
           prop="cateName"
           width="120" align="left">
+        </el-table-column>
+        <el-table-column
+            label="子栏目名称"
+            prop="cateName"
+            width="120" align="left">
         </el-table-column>
         <el-table-column
           prop="date"

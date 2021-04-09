@@ -2,7 +2,6 @@ package org.sang.mongodb.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.sang.mongodb.dataobject.ArticleDO;
-import org.sang.mongodb.dataobject.BaseDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -13,17 +12,17 @@ import java.util.List;
 
 @Repository
 @Slf4j
-public class BaseRepository<T extends BaseDO> {
+public class BaseRepository<T> {
 
     protected final int DEFAULT_PAGE_SIZE = 10;
 
     @Autowired
     protected MongoTemplate mongoTemplate;
 
-    private Class<? extends BaseDO> getParseClass(String collectionName) {
-        Class<? extends BaseDO> childClass = null;
+    private Class<?> getParseClass(String collectionName) {
+        Class<?> childClass = null;
         switch (collectionName) {
-            case BaseDO.TYPE_ARTICLE:
+            case ArticleDO.TYPE_ARTICLE:
                 childClass = ArticleDO.class;
                 break;
         }

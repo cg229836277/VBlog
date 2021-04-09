@@ -28,6 +28,7 @@ public enum ServiceExceptionEnum {
     SAVE_ARTICLE_FAIL(1001003000, "文章保存失败"),
     UPDATE_ARTICLE_FAIL(1001003001, "文章更新失败"),
     GET_ARTICLE_FAIL(1001003002, "文章获取失败"),
+    GET_CATEGORIES_FAIL(1001003003, "文章类型获取失败"),
     ;
     /**
      * 错误码

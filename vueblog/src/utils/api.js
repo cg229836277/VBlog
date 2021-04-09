@@ -11,7 +11,7 @@ export const postRequest = (url, params) => {
       return JSON.stringify(data)
     }],
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/json'
     }
   })
 }

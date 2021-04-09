@@ -1,6 +1,8 @@
 package org.sang.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.sang.dataobject.CategoryDO;
+import org.sang.service.ICategoryService;
 import org.sang.vo.ArticleDataObject;
 import org.sang.exception.ServiceException;
 import org.sang.exception.ServiceExceptionEnum;
@@ -22,6 +24,9 @@ public class ArticleController {
 
     @Autowired
     IArticleService iArticleService;
+
+    @Autowired
+    ICategoryService iCategoryService;
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public CommonResult addNewArticle(@RequestBody ArticleDO article) {
@@ -86,6 +91,16 @@ public class ArticleController {
             throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
         } else {
             return CommonResult.success(data);
+        }
+    }
+
+    @RequestMapping(value = "/categories", method = RequestMethod.GET)
+    public CommonResult<List<CategoryDO>> getCategories() {
+        List<CategoryDO> categoryDOList = iCategoryService.getAllCategories();
+        if (categoryDOList == null || categoryDOList.size() == 0) {
+            throw new ServiceException(ServiceExceptionEnum.GET_CATEGORIES_FAIL);
+        } else {
+            return CommonResult.success(categoryDOList);
         }
     }
 }

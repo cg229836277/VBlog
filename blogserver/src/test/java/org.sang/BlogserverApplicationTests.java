@@ -129,13 +129,13 @@ public class BlogserverApplicationTests {
     @Test
     public void testInsertArticle() throws Exception {
         ArticleDO articleDO = new ArticleDO();
-        articleDO.setCreateTime(new Date());
+        articleDO.setCreateTime(dateFormat.format(new Date()));
         articleDO.setAuthor("chuckchan");
         articleDO.setContent("haha");
         articleDO.setPublishDate(dateFormat.format(new Date()));
         articleDO.setSubTitle("flutter demo test");
         articleDO.setSummary("flutter");
-        articleDO.setTags("flutter");
+        articleDO.setTags(new String[]{"flutter"});
         articleDO.setTitle("flutter tutorial");
         articleDO.setType("blog");
         Random random = new Random();
@@ -168,13 +168,13 @@ public class BlogserverApplicationTests {
     @Test
     public void testUpdateArticle() throws Exception {
         ArticleDO articleDO = new ArticleDO();
-        articleDO.setCreateTime(new Date());
+        articleDO.setCreateTime(dateFormat.format(new Date()));
         articleDO.setAuthor("chuckchan");
         articleDO.setContent("haha");
         articleDO.setPublishDate(dateFormat.format(new Date()));
         articleDO.setSubTitle("flutter demo test");
         articleDO.setSummary("flutter");
-        articleDO.setTags("flutter");
+        articleDO.setTags(new String[]{"flutter"});
         articleDO.setTitle("flutter tutorial");
         articleDO.setType("blog");
         articleDO.setId(3);

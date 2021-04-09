@@ -6,13 +6,13 @@ import org.sang.mongodb.dataobject.ArticleDO;
 import java.util.List;
 
 public interface IArticleService {
-    public ArticleDO insert(ArticleDO data);
+    ArticleDO insert(ArticleDO data);
 
-    public ArticleDO update(ArticleDO data);
+    ArticleDO update(ArticleDO data);
 
-    public List<ArticleDO> getByType(String type);
+    List<ArticleDO> getByType(String type);
 
-    public ArticleDO getById(String id);
+    ArticleDO getById(String id);
 
-    public ArticleDataObject getByStatus(int status, int pageIndx, int pageSize);
+    ArticleDataObject getByStatus(int status, int pageIndx, int pageSize);
 }

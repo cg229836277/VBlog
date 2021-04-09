@@ -59,3 +59,22 @@ CREATE TABLE `users` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `categories`;
+CREATE TABLE `categories` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `parent_name` varchar(64) DEFAULT NULL,
+  `child_name` varchar(64) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
+
+INSERT INTO `categories` VALUES (1, '客户端', 'Android', NULL);
+INSERT INTO `categories` VALUES (2, '客户端', 'iOS', NULL);
+INSERT INTO `categories` VALUES (3, '客户端', '小程序', NULL);
+INSERT INTO `categories` VALUES (4, '前端', '基础', NULL);
+INSERT INTO `categories` VALUES (5, '前端', 'JavaScript', NULL);
+INSERT INTO `categories` VALUES (6, '前端', 'Vue', NULL);
+INSERT INTO `categories` VALUES (7, '服务端', 'Spring Boot', NULL);
+INSERT INTO `categories` VALUES (8, '混合开发', 'flutter', NULL);
+INSERT INTO `categories` VALUES (9, '基础', '数据结构与算法', NULL);
