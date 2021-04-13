@@ -37,16 +37,12 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
 
-    private TokenUtils tokenUtils;
-
     private RoleMapper roleMapper;
 
     private UserMapper userMapper;
 
-    public TokenLoginFilter(AuthenticationManager authenticationManager, TokenUtils tokenUtils
-            , RoleMapper roleMapper, UserMapper userMapper) {
+    public TokenLoginFilter(AuthenticationManager authenticationManager, RoleMapper roleMapper, UserMapper userMapper) {
         this.authenticationManager = authenticationManager;
-        this.tokenUtils = tokenUtils;
         this.roleMapper = roleMapper;
         this.userMapper = userMapper;
         this.setPostOnly(false);
@@ -82,10 +78,9 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
             log.info("attemptAuthentication ps:" + savedUserDO.getPassword());
             return this.authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(savedUserDO.getUsername(), userDO.getPassword(), authorities));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new ServiceException(ServiceExceptionEnum.AUTHORIZATION_FAIL_ERROR);
         }
-
     }
 
     @Override
@@ -95,7 +90,7 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
         UserDO savedUserDO = userMapper.selectByUsername(user.getUsername());
         RoleDO roleDO = roleMapper.selectByUserId(savedUserDO.getId());
         String roleName = roleDO.getName();
-        String token = tokenUtils.createToken(savedUserDO, roleName);
+        String token = TokenUtils.createToken(savedUserDO, roleName);
         log.info("token is:" + token);
         savedUserDO.setToken(token);
         savedUserDO.setPassword("");

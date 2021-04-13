@@ -22,10 +22,10 @@ public class TokenUtils implements Serializable {
      * Token 有效时长
      */
     @Value("${token.expire}")
-    private long tokenExpiration = 3600;
+    private static long tokenExpiration = 3600;
 
     @Value("${token.key}")
-    private String tokenSignKey;
+    private static String tokenSignKey;
 
     private static final long serialVersionUID = -3L;
 
@@ -37,7 +37,7 @@ public class TokenUtils implements Serializable {
      * @param userDO 用户信息
      * @return 生成的Token字符串 or null
      */
-    public String createToken(UserDO userDO, String roleName) {
+    public static String createToken(UserDO userDO, String roleName) {
         try {
             log.info("tokenSignKey:" + tokenSignKey + ",tokenExpiration:" + tokenExpiration);
             // Token 的过期时间
@@ -72,7 +72,7 @@ public class TokenUtils implements Serializable {
      * @param token Token 字符串
      * @return sysUser 用户信息
      */
-    public UserDO validationToken(String token) {
+    public static UserDO validationToken(String token) {
         try {
 //            String user = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token).getBody().getSubject();
             // 解密 Token，获取 Claims 主体

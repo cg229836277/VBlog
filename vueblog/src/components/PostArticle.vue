@@ -60,6 +60,7 @@ import 'mavon-editor/dist/css/index.css'
 import { isNotNullORBlank } from '../utils/utils'
 
 import { STATUS_STORED } from '../constant/status'
+import { formatCurDate } from '../utils/date'
 
 export default {
   mounted: function () {
@@ -120,7 +121,7 @@ export default {
         author: _this.$store.getters.getUserName,
         publish_date: _this.formatDate(new Date()),
         type: _this.article.type,
-        create_time: _this.article.create_time.length > 0 ? _this.article.create_time : _this.formatDate(new Date()),
+        create_time: _this.article.create_time.length > 0 ? _this.article.create_time : formatCurDate(),
         category_id: this.getCategoryId(),
       }).then(resp => {
         _this.loading = false
@@ -140,7 +141,7 @@ export default {
     },
     getCategories () {
       var _this = this
-      getRequest('/article/categories').then(resp => {
+      getRequest('/category/all').then(resp => {
         let jsonData = resp.data
         if (jsonData != null && jsonData.code == 0) {
           _this.categories = jsonData.data
@@ -202,21 +203,6 @@ export default {
       console.log('categoryMap values:' + this.categoryChild)
       console.log('categoryMap keys:' + this.categoryParent)
     },
-    formatDate (date) {
-      let year = date.getFullYear()
-      let month = date.getMonth() + 1
-      let day = date.getDate()
-      let hours = date.getHours()
-      let minutes = date.getMinutes()
-      let seconds = date.getSeconds()
-      if (month < 10) {
-        month = '0' + month
-      }
-      if (day < 10) {
-        day = '0' + day
-      }
-      return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds
-    }
   }
   ,
   data () {

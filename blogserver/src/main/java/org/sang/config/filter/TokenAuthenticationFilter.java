@@ -21,11 +21,9 @@ import java.util.List;
 
 @Slf4j
 public class TokenAuthenticationFilter extends BasicAuthenticationFilter {
-    private TokenUtils tokenUtils;
 
-    public TokenAuthenticationFilter(AuthenticationManager authManager, TokenUtils tokenUtils) {
+    public TokenAuthenticationFilter(AuthenticationManager authManager) {
         super(authManager);
-        this.tokenUtils = tokenUtils;
     }
 
     @Override
@@ -51,7 +49,7 @@ public class TokenAuthenticationFilter extends BasicAuthenticationFilter {
         log.info("header token is:" + token);
         if (token != null && !"".equals(token.trim())) {
             // parse the token.
-            UserDO userDO = tokenUtils.validationToken(token);
+            UserDO userDO = TokenUtils.validationToken(token);
             String userName = userDO.getUsername();
             String roleName = userDO.getRoleName();
             List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>(1);

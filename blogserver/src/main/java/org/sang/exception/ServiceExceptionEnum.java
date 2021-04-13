@@ -24,12 +24,10 @@ public enum ServiceExceptionEnum {
     LOGOUT_FAILED(1001002011, "注销失败"),
     LOGIN_EXPIRATION(1001002012, "登录过期，请重新登录"),
 
-    //文章处理相关
     SAVE_ARTICLE_FAIL(1001003000, "文章保存失败"),
-    UPDATE_ARTICLE_FAIL(1001003001, "文章更新失败"),
-    GET_ARTICLE_FAIL(1001003002, "文章获取失败"),
-    GET_CATEGORIES_FAIL(1001003003, "文章类型获取失败"),
+    GET_CATEGORY_PARAMETERS_INVALID(1001003001, "文章栏目参数不完整"),
     ;
+
     /**
      * 错误码
      */

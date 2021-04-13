@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Login from '@/components/Login'
 import Home from '@/components/Home'
 import ArticleList from '@/components/ArticleList'
-import CateMana from '@/components/CateMana'
+import CategoryManager from '@/components/CategoryManager'
 import DataCharts from '@/components/DataCharts'
 import PostArticle from '@/components/PostArticle'
 import UserMana from '@/components/UserMana'
@@ -82,7 +82,7 @@ export default new Router({
           path: '/cateMana',
           iconCls: 'fa fa-reorder',
           name: '栏目管理',
-          component: CateMana
+          component: CategoryManager
         }
       ]
     }, {

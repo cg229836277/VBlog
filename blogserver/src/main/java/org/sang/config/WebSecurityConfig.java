@@ -6,7 +6,6 @@ import org.sang.config.filter.TokenLoginFilter;
 import org.sang.config.filter.UnauthorizedEntryPoint;
 import org.sang.config.impl.TokenLogoutHandler;
 import org.sang.config.impl.UserDetailsServiceImpl;
-import org.sang.config.utils.TokenUtils;
 import org.sang.mapper.RoleMapper;
 import org.sang.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -39,9 +37,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
     private RoleMapper roleMapper;
-
-    @Resource
-    private TokenUtils tokenUtils;
 
     @Resource
     private UserDetailsServiceImpl userDetailsService;
@@ -68,27 +63,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
-        // 配置 CSRF 关闭,允许跨域访问
-        httpSecurity.csrf().disable();
-        // 指定错误未授权访问的处理类
-        httpSecurity.exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint);
-        // 关闭 Session
-        httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        // 允许 登录 注册的 api 的无授权访问，其他需要授权访问
         httpSecurity.authorizeRequests()
-                .antMatchers("/api/user/login", "/api/user/register", "/login")
-                .permitAll().anyRequest().authenticated().and()
-                .formLogin().loginProcessingUrl("/login").permitAll().and()
-                .logout().logoutUrl("/logout") // 配置注销登录请求URL为"/logout"（默认也就是 /logout）
-                .clearAuthentication(true).addLogoutHandler(new TokenLogoutHandler()); // 清除身份认证信息;
-        httpSecurity.addFilter(new TokenLoginFilter(authenticationManagerBean(), tokenUtils, roleMapper, userMapper));
-        httpSecurity.addFilter(new TokenAuthenticationFilter(authenticationManagerBean(), tokenUtils)).httpBasic();
-        // 禁用缓存
-        httpSecurity.headers().cacheControl();
+                .antMatchers("/api/user", "/category", "/article").hasRole("ADMIN")
+                .anyRequest().authenticated()
+                .and().formLogin().permitAll()
+                .and().csrf().disable();
+        httpSecurity.exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint);
+        httpSecurity.logout().clearAuthentication(true).addLogoutHandler(new TokenLogoutHandler());
+        httpSecurity.addFilter(new TokenLoginFilter(authenticationManagerBean(), roleMapper, userMapper));
+        httpSecurity.addFilter(new TokenAuthenticationFilter(authenticationManagerBean()));
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
+//        web.ignoring().antMatchers("/blogimg/**", "/index.html", "/static/**");
         web.ignoring().antMatchers("/index.html", "/static/**", "/templates/**");
     }
 

@@ -41,6 +41,7 @@ public class TokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             token = null;
         }
+
         if (!StringUtils.isEmpty(token)) {
             UserDO userDO = tokenUtils.validationToken(token);
             if (userDO != null) {

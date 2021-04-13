@@ -2,6 +2,7 @@ package org.sang.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.sang.dataobject.CategoryDO;
+import org.sang.exception.CRUDResultEnum;
 import org.sang.service.ICategoryService;
 import org.sang.vo.ArticleDataObject;
 import org.sang.exception.ServiceException;
@@ -25,9 +26,6 @@ public class ArticleController {
     @Autowired
     IArticleService iArticleService;
 
-    @Autowired
-    ICategoryService iCategoryService;
-
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public CommonResult addNewArticle(@RequestBody ArticleDO article) {
         if (article == null) {
@@ -37,7 +35,7 @@ public class ArticleController {
         log.info("data is " + article.toString());
         ArticleDO result = iArticleService.insert(article);
         if (result == null) {
-            throw new ServiceException(ServiceExceptionEnum.SAVE_ARTICLE_FAIL);
+            return CommonResult.error(CRUDResultEnum.GET_ARTICLE_FAIL);
         } else {
             return CommonResult.success();
         }
@@ -47,7 +45,7 @@ public class ArticleController {
     public CommonResult<ArticleDO> getArticleById(@PathVariable String id) {
         ArticleDO data = iArticleService.getById(id);
         if (data == null) {
-            throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
+            return CommonResult.error(CRUDResultEnum.GET_ARTICLE_FAIL);
         } else {
             return CommonResult.success(data);
         }
@@ -57,7 +55,7 @@ public class ArticleController {
     public CommonResult<List<ArticleDO>> getArticleByType(@PathVariable String type) {
         List<ArticleDO> data = iArticleService.getByType(type);
         if (data == null) {
-            throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
+            return CommonResult.error(CRUDResultEnum.GET_ARTICLE_FAIL);
         } else {
             return CommonResult.success(data);
         }
@@ -67,7 +65,7 @@ public class ArticleController {
     public CommonResult updateArticle(@RequestBody ArticleDO article) {
         ArticleDO data = iArticleService.update(article);
         if (data == null) {
-            throw new ServiceException(ServiceExceptionEnum.UPDATE_ARTICLE_FAIL);
+            return CommonResult.error(CRUDResultEnum.UPDATE_ARTICLE_FAIL);
         } else {
             return CommonResult.success();
         }
@@ -88,19 +86,9 @@ public class ArticleController {
         log.info("defaultStatus:" + defaultStatus + ",defaultPageIndex:" + defaultPageIndex + ",defaultPageSize:" + defaultPageSize);
         ArticleDataObject data = iArticleService.getByStatus(defaultStatus, defaultPageIndex, defaultPageSize);
         if (data == null) {
-            throw new ServiceException(ServiceExceptionEnum.GET_ARTICLE_FAIL);
+            return CommonResult.error(CRUDResultEnum.GET_ARTICLE_FAIL);
         } else {
             return CommonResult.success(data);
-        }
-    }
-
-    @RequestMapping(value = "/categories", method = RequestMethod.GET)
-    public CommonResult<List<CategoryDO>> getCategories() {
-        List<CategoryDO> categoryDOList = iCategoryService.getAllCategories();
-        if (categoryDOList == null || categoryDOList.size() == 0) {
-            throw new ServiceException(ServiceExceptionEnum.GET_CATEGORIES_FAIL);
-        } else {
-            return CommonResult.success(categoryDOList);
         }
     }
 }

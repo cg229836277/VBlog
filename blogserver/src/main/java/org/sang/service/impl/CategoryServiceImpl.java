@@ -18,4 +18,24 @@ public class CategoryServiceImpl implements ICategoryService {
     public List<CategoryDO> getAllCategories() {
         return categoryMapper.selectAllCategories();
     }
+
+    @Override
+    public boolean addCategory(CategoryDO categoryDO) {
+        return categoryMapper.addCategory(categoryDO);
+    }
+
+    @Override
+    public boolean deleteCategory(long id) {
+        return categoryMapper.deleteCategory(id);
+    }
+
+    @Override
+    public boolean deleteCategories(int[] ids) {
+        return categoryMapper.deleteCategories(ids);
+    }
+
+    @Override
+    public boolean updateCategory(CategoryDO categoryDO) {
+        return categoryMapper.updateCategory(categoryDO);
+    }
 }

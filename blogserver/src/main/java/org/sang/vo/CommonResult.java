@@ -2,6 +2,7 @@ package org.sang.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.sang.exception.CRUDResultEnum;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
@@ -40,6 +41,10 @@ public class CommonResult<T> implements Serializable {
      */
     public static <T> CommonResult<T> error(CommonResult<?> result) {
         return error(result.getCode(), result.getMessage());
+    }
+
+    public static <T> CommonResult<T> error(CRUDResultEnum crudResultEnum) {
+        return error(crudResultEnum.getCode(), crudResultEnum.getMessage());
     }
 
     public static <T> CommonResult<T> error(Integer code, String message) {
