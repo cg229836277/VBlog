@@ -79,7 +79,7 @@ export default new Router({
       name: '栏目管理',
       children: [
         {
-          path: '/cateMana',
+          path: '/categoryManager',
           iconCls: 'fa fa-reorder',
           name: '栏目管理',
           component: CategoryManager
