@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div><span>这里是读书页面</span></div>
 </template>
 
 <script>

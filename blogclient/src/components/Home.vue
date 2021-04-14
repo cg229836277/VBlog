@@ -1,20 +1,7 @@
 <template>
-  <el-container class="home_container">
-    <el-header>
-      <el-menu :default-active="activeIndex" class="header-el-menu" mode="horizontal"
-               @select="handleItemSelect" background-color="transparent" active-text-color="#1e90ff">
-        <el-menu-item index="1" class="header-el-submenu-main">主页</el-menu-item>
-        <el-submenu index="2" class="header-el-submenu-life">
-          <template slot="title">生活</template>
-          <el-menu-item index="2-1" class="child-menu-1">读书</el-menu-item>
-          <el-menu-item index="2-2" class="child-menu-2">歌单</el-menu-item>
-        </el-submenu>
-        <el-menu-item index="3" class="header-el-submenu-about">关于</el-menu-item>
-      </el-menu>
-
-    </el-header>
-    <el-container>
-      <el-aside width="200px">
+  <el-container>
+    <el-container id="aside_container">
+      <el-aside style="background-color: brown">
         <ul class="aside_list">
           <li><img class="aside_icon" src="../assets/header_icon.svg" alt="网站个人图标" title="网站图标" width="96px"
                    height="96px"/></li>
@@ -37,8 +24,29 @@
               href="https://chengang.plus">个人网站</a></li>
         </ul>
       </el-aside>
+    </el-container>
+    <el-container class="home_container">
+      <el-header>
+        <el-menu :default-active="activeIndex" class="header-el-menu" mode="horizontal"
+                 @select="handleItemSelect" background-color="transparent" active-text-color="#1e90ff" router>
+          <template v-for="(item,index) in this.$router.options.routes">
+            <el-submenu :index="'' + index" :key="index"
+                        v-if="item.children && item.children.length > 1 && item.children[0].menu_item"
+                        class="header-el-submenu-life">
+              <template slot="title">{{ item.name }}</template>
+              <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path">
+                {{ child.name }}
+              </el-menu-item>
+            </el-submenu>
+            <template v-else-if="item.children && !item.menu_item && item.children[0].menu_item">
+              <el-menu-item :index="item.children[0].path" :key="index">{{ item.name }}</el-menu-item>
+            </template>
+          </template>
+        </el-menu>
+      </el-header>
       <el-container>
         <el-main>
+          <router-view></router-view>
         </el-main>
       </el-container>
     </el-container>
@@ -46,6 +54,9 @@
 </template>
 
 <script>
+import { postRequest } from '@/net'
+import { SET_USER } from '@/store'
+
 export default {
   name: 'Home',
   methods: {
@@ -54,42 +65,70 @@ export default {
     },
     handleTabItemCommand (command) {
       console.log(command)
+    },
+    login () {
+      this.loading = true
+      postRequest('/login', {
+        username: 'anonymous',
+        password: 'anonymous',
+      }).then(resp => {
+        this.loading = false
+        if (resp.status === 200) {
+          //成功
+          var json = resp.data
+          if (json.code === 0) {
+            this.$store.commit(SET_USER, json.data)
+          } else {
+            this.$alert('网站初始化失败!', '失败!')
+          }
+        } else {
+          //失败
+          this.$alert('网站初始化失败!', '失败!')
+          this.$store.commit(SET_USER, {})
+        }
+        // eslint-disable-next-line no-unused-vars
+      }, _ => {
+        this.$store.commit(SET_USER, {})
+        this.loading = false
+        this.$alert('找不到服务器!', '失败!')
+      })
     }
   },
   data () {
     return {
-      activeIndex: '1',
+      activeIndex: '/tech',
       categories: {
         childName: [],
         parentName: [],
       },
     }
+  },
+  mounted () {
+    this.login()
   }
 }
 </script>
 
 <style scoped>
-.el-menu {
-  padding-left: 30%;
-  padding-right: 20%;
-}
 
 .header-el-submenu-life {
   margin-left: 15%;
   margin-right: 15%;
 }
 
-.el-aside {
+#aside_container {
   align-items: center;
-  display: inline-block;
-  width: 20%;
   margin-left: 2%;
+}
+
+.home_container {
+  width: 75%
 }
 
 .aside_list {
   display: inline-block;
   position: absolute;
-  top: 30%;
+  top: 20%;
   list-style-type: none;
   align-items: center;
 }
@@ -118,41 +157,5 @@ export default {
 .aside_list li a {
   margin: auto 0;
   padding-left: 0.5em;
-}
-
-.article_grid {
-  display: inline-block;
-  width: 70%;
-  margin-top: 3%;
-  column-count: 2;
-}
-
-.article_grid_item_margin {
-  margin-top: 2em;
-}
-
-.article_grid_item, .article_grid_item_margin {
-  width: 30em;
-  height: 10em;
-  border: 1px solid #ACACAC;
-  border-radius: 10px;
-}
-
-.article_grid_item_img {
-  margin-top: 1.2em;
-  margin-left: 1em;
-  margin-right: 0.1em;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.article_grid_item_title {
-  color: dodgerblue;
-  display: inline-block;
-  vertical-align: bottom;
-}
-
-.article_grid_item_detail {
-  margin: 1em 1.2em;
 }
 </style>

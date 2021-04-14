@@ -80,12 +80,14 @@ public class TokenUtils implements Serializable {
             assert claims != null;
             // 验证 Token 有没有过期 过期时间
             Date expiration = claims.getExpiration();
-            // 判断是否过期 过期时间要在当前日期之后
-            if (!expiration.after(new Date())) {
+            String userName = claims.getAudience();
+            // 判断是否过期 过期时间要在当前日期之后,为所有访问个人主页的用户设置一个匿名用户登录
+            if (!expiration.after(new Date()) && !"anonymous".equals(userName)) {
+                log.info("expiration occur");
                 return null;
             }
             UserDO userDO = new UserDO();
-            userDO.setUsername(claims.getAudience());
+            userDO.setUsername(userName);
             userDO.setRoleName(claims.get("role").toString());
             userDO.setPassword(claims.get("password").toString());
             return userDO;

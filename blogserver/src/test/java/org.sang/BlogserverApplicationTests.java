@@ -127,6 +127,29 @@ public class BlogserverApplicationTests {
     }
 
     @Test
+    public void testAnonymousRegister() throws Exception {
+        UserDO userDO = new UserDO();
+        userDO.setUsername("anonymous");
+        userDO.setCreateTime(new Date());
+        userDO.setNickname("anonymous");
+        userDO.setEnable(true);
+        userDO.setPassword("anonymous");
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                .post("/api/user/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDO)));
+        // 校验结果
+        String response = resultActions.andReturn().getResponse().getContentAsString();
+        log.info("testAnonymousRegister response:" + response);
+        if (!Utils.isEmpty(response)) {
+            CommonResult<UserDO> commonResult = objectMapper.readValue(response, CommonResult.class);
+            assert (commonResult != null && commonResult.isSuccess() && commonResult.getData() != null);
+            UserDO loginResult = objectMapper.convertValue(commonResult.getData(), UserDO.class);
+            assert (loginResult != null && !StringUtils.isEmpty(loginResult.getToken()));
+        }
+    }
+
+    @Test
     public void testInsertArticle() throws Exception {
         ArticleDO articleDO = new ArticleDO();
         articleDO.setCreateTime(dateFormat.format(new Date()));

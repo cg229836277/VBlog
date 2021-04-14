@@ -64,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeRequests()
-                .antMatchers("/api/user", "/category", "/article").hasRole("ADMIN")
+                .antMatchers("/api/user/register", "/category/add", "/category/delete", "/category/delete/ids", "/category/update", "/article/upload", "/article/update").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
                 .and().formLogin().permitAll()
                 .and().csrf().disable();

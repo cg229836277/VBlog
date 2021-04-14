@@ -5,6 +5,7 @@ import org.sang.exception.ServiceExceptionEnum;
 import org.sang.service.IUsersService;
 import org.sang.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +47,7 @@ public class UserController {
      * @param userDO 用户注册信息
      * @return 用户注册结果
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/register")
     public CommonResult<UserDO> register(@RequestBody @Valid final UserDO userDO) {
         return userService.register(userDO);

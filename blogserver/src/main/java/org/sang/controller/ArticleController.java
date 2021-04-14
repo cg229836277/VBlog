@@ -11,6 +11,7 @@ import org.sang.mongodb.dataobject.ArticleDO;
 import org.sang.service.IArticleService;
 import org.sang.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ArticleController {
     @Autowired
     IArticleService iArticleService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public CommonResult addNewArticle(@RequestBody ArticleDO article) {
         if (article == null) {
@@ -61,6 +63,7 @@ public class ArticleController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public CommonResult updateArticle(@RequestBody ArticleDO article) {
         ArticleDO data = iArticleService.update(article);

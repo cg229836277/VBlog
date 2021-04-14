@@ -9,6 +9,7 @@ import org.sang.exception.ServiceExceptionEnum;
 import org.sang.service.ICategoryService;
 import org.sang.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -32,6 +33,7 @@ public class CategoryController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public CommonResult addCategory(@RequestBody final CategoryDO categoryDO) {
         if (categoryDO == null || StringUtils.isEmpty(categoryDO.getChildName()) || StringUtils.isEmpty(categoryDO.getParentName())) {
@@ -41,13 +43,14 @@ public class CategoryController {
         return result ? CommonResult.success() : CommonResult.error(CRUDResultEnum.ADD_CATEGORY_FAIL);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public CommonResult deleteCategory(@RequestBody final CategoryDO categoryDO) {
         boolean result = iCategoryService.deleteCategory(categoryDO.getId());
         return result ? CommonResult.success() : CommonResult.error(CRUDResultEnum.DELETE_CATEGORY_FAIL);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/delete/ids", method = RequestMethod.POST)
     public CommonResult deleteCategories(@RequestBody final CategoryDO categoryDO) {
         log.info("ids is " + categoryDO.getIds().toString());
@@ -55,7 +58,7 @@ public class CategoryController {
         return result ? CommonResult.success() : CommonResult.error(CRUDResultEnum.DELETE_CATEGORY_FAIL);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public CommonResult updateCategory(@RequestBody final CategoryDO categoryDO) {
         if (categoryDO == null || StringUtils.isEmpty(categoryDO.getChildName()) || StringUtils.isEmpty(categoryDO.getParentName())) {

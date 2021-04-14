@@ -3,7 +3,6 @@ import Router from 'vue-router'
 
 import Home from '@/components/Home'
 import Technology from '@/components/Technology'
-import Life from '@/components/Life'
 import Reading from '@/components/Reading'
 import MusicList from '@/components/MusicList'
 import About from '@/components/About'
@@ -15,30 +14,37 @@ export default new Router({
     {
       path: '/',
       component: Home,
-      name: '主页',
+      name: '',
       iconCls: 'fa fa-file-text-o',
       menu_item: false,
+      redirect: '/tech',
     }, {
       path: '/',
-      component: Technology,
+      component: Home,
       name: '主页',
-      menu_item: true,
+      menu_item: false,
+      children: [
+        {
+          path: '/tech',
+          component: Technology,
+          name: '主页',
+          menu_item: true,
+        }
+      ]
     }, {
       path: '/',
-      component: Life,
+      component: Home,
       name: '生活',
-      menu_item: true,
+      menu_item: false,
       children: [
         {
           path: '/reading',
-          iconCls: 'fa fa-reorder',
           name: '读书',
           component: Reading,
           menu_item: true,
         },
         {
           path: '/music_list',
-          iconCls: 'fa fa-reorder',
           name: '歌单',
           component: MusicList,
           menu_item: true,
@@ -46,10 +52,17 @@ export default new Router({
       ]
     }, {
       path: '/',
-      component: About,
+      component: Home,
       name: '关于',
-      menu_item: true,
-      iconCls: 'fa fa-bar-chart',
+      menu_item: false,
+      children: [
+        {
+          path: '/about',
+          component: About,
+          name: '关于',
+          menu_item: true,
+        },
+      ]
     }
   ]
 })

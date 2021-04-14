@@ -20,6 +20,9 @@ public class CategoryDO extends BaseDO {
     @NotBlank
     String childName;
 
+    @TableField(value = "category_desc")
+    String categoryDesc;
+
     @TableField(exist = false)
     @JsonDeserialize
     @JsonSerialize

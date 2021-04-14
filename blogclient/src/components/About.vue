@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div><span>这里是关于页面</span></div>
 </template>
 
 <script>

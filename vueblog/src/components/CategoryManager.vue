@@ -3,11 +3,16 @@
     <el-header class="cate_mana_header">
       <el-input
           placeholder="请输入父一级栏目名称"
-          v-model="parentName" style="width: 200px;">
+          v-model="parentName" style="width: 120px;">
       </el-input>
       <el-input
           placeholder="请输入子一级栏目名称"
-          v-model="childName" style="width: 200px;margin-left: 10px">
+          v-model="childName" style="width: 120px;margin-left: 10px">
+      </el-input>
+
+      <el-input
+          placeholder="请输入描述"
+          v-model="categoryDesc" style="width: 200px;margin-left: 10px">
       </el-input>
       <el-button type="primary" size="medium" style="margin-left: 10px" @click="addCategory">新增栏目</el-button>
     </el-header>
@@ -35,6 +40,11 @@
         <el-table-column
             label="子栏目名称"
             prop="childName"
+            width="120" align="left">
+        </el-table-column>
+        <el-table-column
+            label="描述"
+            prop="categoryDesc"
             width="120" align="left">
         </el-table-column>
         <el-table-column
@@ -69,6 +79,9 @@
             <el-form-item label="子一级名称">
               <el-input v-model="categoryItem.childName" autocomplete="off"></el-input>
             </el-form-item>
+            <el-form-item label="描述">
+              <el-input v-model="categoryItem.categoryDesc" autocomplete="off"></el-input>
+            </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -100,7 +113,8 @@ export default {
       postRequest('/category/add', {
         createTime: createTime,
         parentName: _this.parentName,
-        childName: _this.childName
+        childName: _this.childName,
+        categoryDesc: _this.categoryDesc,
       }).then(resp => {
         let jsonData = resp.data
         if (jsonData && jsonData.code == 0) {
@@ -207,7 +221,7 @@ export default {
         } else {
           _this.$message({
             type: 'error',
-            message: jsonData.data
+            message: jsonData.message
           })
         }
         _this.loading = false
@@ -219,6 +233,7 @@ export default {
         parentName: row.parentName,
         childName: row.childName,
         categoryId: row.id,
+        categoryDesc: row.categoryDesc,
       }
     },
     commitCategory (modifiedCategory) {
@@ -230,6 +245,7 @@ export default {
         childName: modifiedCategory.childName,
         createTime: new Date(),
         id: modifiedCategory.categoryId,
+        categoryDesc: modifiedCategory.categoryDesc,
       }).then(resp => {
         var json = resp.data
         this.$message({
@@ -255,6 +271,7 @@ export default {
       dialogFormVisible: false,
       parentName: '',
       childName: '',
+      categoryDesc: '',
       categoryName: '',
       deleteItems: [],
       categories: [],
@@ -264,6 +281,7 @@ export default {
         parentName: '',
         childName: '',
         createTime: new Date(),
+        categoryDesc: ''
       }
     }
   }

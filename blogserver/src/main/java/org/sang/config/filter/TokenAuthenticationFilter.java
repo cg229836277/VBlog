@@ -5,6 +5,8 @@ import org.sang.config.utils.StringUtils;
 import org.sang.config.utils.TokenUtils;
 import org.sang.dataobject.RoleDO;
 import org.sang.dataobject.UserDO;
+import org.sang.exception.ServiceException;
+import org.sang.exception.ServiceExceptionEnum;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,24 +46,28 @@ public class TokenAuthenticationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        // token置于header里
-        String token = request.getHeader("token");
-        log.info("header token is:" + token);
-        if (token != null && !"".equals(token.trim())) {
-            // parse the token.
-            UserDO userDO = TokenUtils.validationToken(token);
-            String userName = userDO.getUsername();
-            String roleName = userDO.getRoleName();
-            List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>(1);
-            if (roleName != null && roleName.length() > 0) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
-            } else {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + RoleDO.ROLE_NORMAL));
+        try {
+            // token置于header里
+            String token = request.getHeader("token");
+            log.info("header token is:" + token);
+            if (token != null && !"".equals(token.trim())) {
+                // parse the token.
+                UserDO userDO = TokenUtils.validationToken(token);
+                String userName = userDO.getUsername();
+                String roleName = userDO.getRoleName();
+                List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>(1);
+                if (roleName != null && roleName.length() > 0) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
+                } else {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + RoleDO.ROLE_NORMAL));
+                }
+                if (!StringUtils.isEmpty(userName)) {
+                    return new UsernamePasswordAuthenticationToken(userName, token, authorities);
+                }
+                return null;
             }
-            if (!StringUtils.isEmpty(userName)) {
-                return new UsernamePasswordAuthenticationToken(userName, token, authorities);
-            }
-            return null;
+        } catch (Exception e) {
+            throw new ServiceException(ServiceExceptionEnum.AUTHORIZATION_FAIL_ERROR);
         }
         return null;
     }

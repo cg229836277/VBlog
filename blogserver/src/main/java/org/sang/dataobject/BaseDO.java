@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -14,6 +15,6 @@ public class BaseDO {
     public long id;
 
     @TableField(value = "create_time")
-    @NotBlank
+    @NotNull
     public Date createTime;
 }
