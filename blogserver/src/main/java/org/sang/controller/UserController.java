@@ -47,7 +47,7 @@ public class UserController {
      * @param userDO 用户注册信息
      * @return 用户注册结果
      */
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/register")
     public CommonResult<UserDO> register(@RequestBody @Valid final UserDO userDO) {
         return userService.register(userDO);

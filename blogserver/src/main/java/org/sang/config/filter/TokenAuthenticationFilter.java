@@ -31,6 +31,10 @@ public class TokenAuthenticationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws IOException, ServletException {
+        String requestUrl = req.getRequestURL().toString();
+        log.info("TokenAuthentication requestUrl:" + requestUrl);
+        String method = req.getMethod();
+        log.info("TokenAuthentication method:" + method);
         String header = req.getHeader("token");
 
         if (header == null) {

@@ -20,8 +20,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sang on 2017/12/17.
@@ -61,13 +66,34 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    /**
+     * 跨域配置
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        // 允许跨域访问的 URL
+        List<String> allowedOriginsUrl = new ArrayList<>();
+        allowedOriginsUrl.add("http://localhost:8080");
+        allowedOriginsUrl.add("http://127.0.0.1:8080");
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        // 设置允许跨域访问的 URL
+        config.setAllowedOrigins(allowedOriginsUrl);
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
+        //"/api/user/register",
         httpSecurity.authorizeRequests()
-                .antMatchers("/api/user/register", "/category/add", "/category/delete", "/category/delete/ids", "/category/update", "/article/upload", "/article/update").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/category/add", "/category/delete", "/category/delete/ids", "/category/update", "/article/upload", "/article/update").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
                 .and().formLogin().permitAll()
-                .and().csrf().disable();
+                .and().cors().and().csrf().disable();
         httpSecurity.exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint);
         httpSecurity.logout().clearAuthentication(true).addLogoutHandler(new TokenLogoutHandler());
         httpSecurity.addFilter(new TokenLoginFilter(authenticationManagerBean(), roleMapper, userMapper));

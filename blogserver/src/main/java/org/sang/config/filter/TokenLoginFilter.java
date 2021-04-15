@@ -53,6 +53,10 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
             throws AuthenticationException {
         try {
+            String requestUrl = req.getRequestURL().toString();
+            log.info("TokenLogin requestUrl:" + requestUrl);
+            String method = req.getMethod();
+            log.info("TokenLogin method:" + method);
             InputStream inputStream = req.getInputStream();
             //获取body数据
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));

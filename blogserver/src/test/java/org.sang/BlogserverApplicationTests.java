@@ -129,11 +129,11 @@ public class BlogserverApplicationTests {
     @Test
     public void testAnonymousRegister() throws Exception {
         UserDO userDO = new UserDO();
-        userDO.setUsername("anonymous");
+        userDO.setUsername("unknownUser");
         userDO.setCreateTime(new Date());
-        userDO.setNickname("anonymous");
+        userDO.setNickname("unknownUser");
         userDO.setEnable(true);
-        userDO.setPassword("anonymous");
+        userDO.setPassword("unknownUser");
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
                 .post("/api/user/register")
                 .contentType(MediaType.APPLICATION_JSON)

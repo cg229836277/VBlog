@@ -54,9 +54,6 @@
 </template>
 
 <script>
-import { postRequest } from '@/net'
-import { SET_USER } from '@/store'
-
 export default {
   name: 'Home',
   methods: {
@@ -66,46 +63,12 @@ export default {
     handleTabItemCommand (command) {
       console.log(command)
     },
-    login () {
-      this.loading = true
-      postRequest('/login', {
-        username: 'anonymous',
-        password: 'anonymous',
-      }).then(resp => {
-        this.loading = false
-        if (resp.status === 200) {
-          //成功
-          var json = resp.data
-          if (json.code === 0) {
-            this.$store.commit(SET_USER, json.data)
-          } else {
-            this.$alert('网站初始化失败!', '失败!')
-          }
-        } else {
-          //失败
-          this.$alert('网站初始化失败!', '失败!')
-          this.$store.commit(SET_USER, {})
-        }
-        // eslint-disable-next-line no-unused-vars
-      }, _ => {
-        this.$store.commit(SET_USER, {})
-        this.loading = false
-        this.$alert('找不到服务器!', '失败!')
-      })
-    }
   },
   data () {
     return {
       activeIndex: '/tech',
-      categories: {
-        childName: [],
-        parentName: [],
-      },
     }
   },
-  mounted () {
-    this.login()
-  }
 }
 </script>
 
