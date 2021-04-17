@@ -1,31 +1,31 @@
 <template>
-  <el-container>
+  <el-container class="parent_content">
     <el-container id="aside_container">
       <el-aside style="background-color: brown">
         <ul class="aside_list">
-          <li><img class="aside_icon" src="../assets/header_icon.svg" alt="网站个人图标" title="网站图标" width="96px"
+          <li><img class="aside_icon" src="../../public/assets/header_icon.svg" alt="网站个人图标" title="网站图标" width="96px"
                    height="96px"/></li>
           <li><p class="aside_name">Chuck Chan</p></li>
-          <li><img class="aside_img" src="../assets/motto.svg" width="24em" height="24em"/>
+          <li><img class="aside_img" src="../../public/assets/motto.svg" width="24em" height="24em"/>
             <p>水清，濯吾缨；水浊，濯吾足。</p>
           </li>
-          <li><img class="aside_img" src="../assets/location.svg" width="24em"
+          <li><img class="aside_img" src="../../public/assets/location.svg" width="24em"
                    height="24em"/>
             <p>深圳/广东</p></li>
-          <li><img class="aside_img" src="../assets/email.svg" width="24em" height="24em"/>
+          <li><img class="aside_img" src="../../public/assets/email.svg" width="24em" height="24em"/>
             <a href="mailto:1301958187@qq.com?subject = From ChuckChan WebSite&body = Nice to meet you!">
               1301958187@qq.com
             </a>
           </li>
-          <li><img class="aside_img" src="../assets/wechatblog.svg" width="24em"
-                   height="24em"/><a href="../assets/wechat.svg">Android部落格</a>
+          <li><img class="aside_img" src="../../public/assets/wechatblog.svg" width="24em"
+                   height="24em"/><a href="../../public/assets/wechat.svg">Android部落格</a>
           </li>
-          <li><img class="aside_img" src="../assets/link.svg" width="24em" height="24em"/><a
+          <li><img class="aside_img" src="../../public/assets/link.svg" width="24em" height="24em"/><a
               href="https://chengang.plus">个人网站</a></li>
         </ul>
       </el-aside>
     </el-container>
-    <el-container class="home_container">
+    <el-container class="home_top_menu_container">
       <el-header>
         <el-menu :default-active="activeIndex" class="header-el-menu" mode="horizontal"
                  @select="handleItemSelect" background-color="transparent" active-text-color="#1e90ff" router>
@@ -44,7 +44,7 @@
           </template>
         </el-menu>
       </el-header>
-      <el-container>
+      <el-container class="category_item_content_container">
         <el-main>
           <router-view></router-view>
         </el-main>
@@ -57,14 +57,14 @@
 export default {
   name: 'Home',
   methods: {
-    handleItemSelect (key, keyPath) {
+    handleItemSelect(key, keyPath) {
       console.log(key, keyPath)
     },
-    handleTabItemCommand (command) {
+    handleTabItemCommand(command) {
       console.log(command)
     },
   },
-  data () {
+  data() {
     return {
       activeIndex: '/tech',
     }
@@ -73,6 +73,10 @@ export default {
 </script>
 
 <style scoped>
+
+#aside_container, .category_item_content_container,.parent_content {
+  height: 100%;
+}
 
 .header-el-submenu-life {
   margin-left: 15%;
@@ -84,7 +88,7 @@ export default {
   margin-left: 2%;
 }
 
-.home_container {
+.home_top_menu_container {
   width: 75%
 }
 

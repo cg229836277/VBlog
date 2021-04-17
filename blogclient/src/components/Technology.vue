@@ -1,33 +1,35 @@
 <template>
-  <article class="article_grid">
-    <template v-for="(item,index) in articleGridItems">
-      <div :style="item.item_should_margin?item_style_margin:item_style" :class="item.item_class"
-           v-on:submit.prevent="gridItemClicked(item)" :key="index">
-        <img :class="item.img_item_class" :src="item.img_item_src" :width="item.img_item_width"
-             :height="item.img_item_height"/>
-        <p v-bind:class="item.item_title_class">{{ item.item_title }}</p>
-        <p v-bind:class="item.item_detail_class">{{ item.item_detail }}</p>
+  <main>
+    <article class="article_grid">
+      <template v-for="(item,index) in articleGridItems">
+        <div :style="item_style"
+             :class="item.item_should_margin?'article_grid_item_margin':'article_grid_item'"
+             v-on:submit.prevent="gridItemClicked(item)" :key="index">
+          <img class="article_grid_item_img" :src="iconSrc[index]"/>
+          <p class="article_grid_item_title">{{ item.item_title }}</p>
+          <p class="article_grid_item_detail">{{ item.item_detail }}</p>
+        </div>
+      </template>
+    </article>
+    <section>
+      <div :style="item_style" class="article_grid_item_margin"
+           v-on:submit.prevent="gridItemClicked(lastGridItem)" :key="'last'">
+        <img class="article_grid_item_img" :src="iconSrc[iconSrc.length - 1]"/>
+        <p class="article_grid_item_title">{{ lastGridItem.item_title }}</p>
+        <p class="article_grid_item_detail">{{ lastGridItem.item_detail }}</p>
       </div>
-    </template>
-  </article>
+    </section>
+  </main>
 </template>
 
 <script>
-import { getRequest, postRequest } from '@/net'
-import { SET_USER } from '@/store'
-import axios from 'axios'
+import {getRequest, postRequest} from '@/net'
+import {SET_USER} from '@/store'
 
 export default {
   name: 'Technology',
-  data () {
+  data() {
     return {
-      item_style_margin: {
-        width: '30em',
-        height: '10em',
-        border: '1px solid #ACACAC',
-        borderRadius: '10px',
-        marginTop: '2em',
-      },
       item_style: {
         width: '30em',
         height: '10em',
@@ -36,24 +38,18 @@ export default {
       },
       articleGridItem: {
         item_should_margin: false,
-        item_class: '',//article_grid_item_margin or article_grid_item
-        img_item_class: 'article_grid_item_img',
-        img_item_src: '',
-        img_item_width: '20px',
-        img_item_height: '20px',
         item_title: '',
-        item_title_class: 'article_grid_item_title',
         item_detail: '',
-        item_detail_class: 'article_grid_item_detail'
       },
+      lastGridItem: {},
       categories: [],
       articleGridItems: [],
-      iconSrc: ['../images/android.svg', '../images/algorithm.svg', '../images/html_css_js.svg',
-        '../images/flutter.svg', '../images/ios.svg', '../images/spring_boot.svg']
+      iconSrc: ['assets/android.svg', 'assets/html_css_js', 'assets/spring_boot.svg',
+        'assets/flutter.svg', 'assets/algorithm.svg'],
     }
   },
   methods: {
-    getAllCategories () {
+    getAllCategories() {
       let _this = this
       _this.loading = true
       getRequest('/category/all').then(resp => {
@@ -61,19 +57,23 @@ export default {
         if (jsonData && jsonData.code == 0) {
           _this.categories = jsonData.data
           let length = _this.categories.length
+          let validIndex = 0
           for (var index = 0; index < length; index++) {
             let itemData = _this.categories[index]
             if (itemData && itemData.categoryDesc) {
-              let shouldMargin = index != 0 && index != 3
-              _this.articleGridItem = {
-                img_item_src: _this.iconSrc[index],
+              let shouldMargin = validIndex == 1 || validIndex == 3
+              console.log('should margin:' + shouldMargin + ",validIndex:" + validIndex)
+              let tempGridItem = {
                 item_title: itemData.parentName,
                 item_detail: itemData.categoryDesc,
                 item_should_margin: shouldMargin,
-                item_class: shouldMargin ? 'article_grid_item_margin' : 'article_grid_item'
               }
-              let tempGridItem = _this.articleGridItem
-              _this.articleGridItems.push(tempGridItem)
+              if (index == length - 1) {
+                _this.lastGridItem = tempGridItem
+              } else {
+                _this.articleGridItems.push(tempGridItem)
+              }
+              ++validIndex
             }
           }
         } else {
@@ -85,10 +85,10 @@ export default {
         _this.loading = false
       })
     },
-    gridItemClicked (itemData) {
+    gridItemClicked(itemData) {
       console.log('itemData is ' + itemData.item_detail)
     },
-    login () {
+    login() {
       let _this = this
       _this.loading = true
       postRequest('/login', {
@@ -118,7 +118,7 @@ export default {
       })
     }
   },
-  mounted () {
+  mounted() {
     this.login()
   },
 }
@@ -126,9 +126,8 @@ export default {
 
 <style scoped>
 .article_grid {
-  display: inline-block;
-  width: 70%;
-  margin-top: 3%;
+  width: 100%;
+  height: 100%;
   column-count: 2;
 }
 
@@ -136,7 +135,7 @@ export default {
   margin-top: 2em;
 }
 
-.article_grid_item, .article_grid_item_margin {
+.article_grid_item, .last_grid_item {
   width: 30em;
   height: 10em;
   border: 1px solid #ACACAC;
@@ -144,6 +143,8 @@ export default {
 }
 
 .article_grid_item_img {
+  width: 1.5em;
+  height: 1.5em;
   margin-top: 1.2em;
   margin-left: 1em;
   margin-right: 0.1em;
