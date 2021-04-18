@@ -6,7 +6,12 @@
              :class="item.item_should_margin?'article_grid_item_margin':'article_grid_item'"
              v-on:submit.prevent="gridItemClicked(item)" :key="index">
           <img class="article_grid_item_img" :src="iconSrc[index]"/>
-          <p class="article_grid_item_title">{{ item.item_title }}</p>
+          <p class="article_grid_item_title">
+            <router-link :to="{ name: 'tech_detail', params: { item_name: item.item_title }}">{{
+                item.item_title
+              }}
+            </router-link>
+          </p>
           <p class="article_grid_item_detail">{{ item.item_detail }}</p>
         </div>
       </template>
@@ -44,7 +49,7 @@ export default {
       lastGridItem: {},
       categories: [],
       articleGridItems: [],
-      iconSrc: ['assets/android.svg', 'assets/html_css_js', 'assets/spring_boot.svg',
+      iconSrc: ['assets/android.svg', 'assets/html_css_js.svg', 'assets/spring_boot.svg',
         'assets/flutter.svg', 'assets/algorithm.svg'],
     }
   },
