@@ -7,7 +7,7 @@
              v-on:submit.prevent="gridItemClicked(item)" :key="index">
           <img class="article_grid_item_img" :src="iconSrc[index]"/>
           <p class="article_grid_item_title">
-            <router-link :to="{ name: 'tech_detail', params: { item_name: item.item_title }}">{{
+            <router-link :to="{ name: 'tech_detail', params: { item_name: item.item_title, item_id:item.item_id }}">{{
                 item.item_title
               }}
             </router-link>
@@ -28,12 +28,12 @@
 </template>
 
 <script>
-import {getRequest, postRequest} from '@/net'
-import {SET_USER} from '@/store'
+import { getRequest, postRequest } from '@/net'
+import { SET_USER } from '@/store'
 
 export default {
   name: 'Technology',
-  data() {
+  data () {
     return {
       item_style: {
         width: '30em',
@@ -45,6 +45,7 @@ export default {
         item_should_margin: false,
         item_title: '',
         item_detail: '',
+        item_id: '',
       },
       lastGridItem: {},
       categories: [],
@@ -54,7 +55,7 @@ export default {
     }
   },
   methods: {
-    getAllCategories() {
+    getAllCategories () {
       let _this = this
       _this.loading = true
       getRequest('/category/all').then(resp => {
@@ -67,11 +68,12 @@ export default {
             let itemData = _this.categories[index]
             if (itemData && itemData.categoryDesc) {
               let shouldMargin = validIndex == 1 || validIndex == 3
-              console.log('should margin:' + shouldMargin + ",validIndex:" + validIndex)
+              console.log('should margin:' + shouldMargin + ',validIndex:' + validIndex)
               let tempGridItem = {
                 item_title: itemData.parentName,
                 item_detail: itemData.categoryDesc,
                 item_should_margin: shouldMargin,
+                item_id: itemData.id,
               }
               if (index == length - 1) {
                 _this.lastGridItem = tempGridItem
@@ -90,10 +92,10 @@ export default {
         _this.loading = false
       })
     },
-    gridItemClicked(itemData) {
+    gridItemClicked (itemData) {
       console.log('itemData is ' + itemData.item_detail)
     },
-    login() {
+    login () {
       let _this = this
       _this.loading = true
       postRequest('/login', {
@@ -123,7 +125,7 @@ export default {
       })
     }
   },
-  mounted() {
+  mounted () {
     this.login()
   },
 }

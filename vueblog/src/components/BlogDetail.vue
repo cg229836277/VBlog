@@ -17,7 +17,7 @@
               article.pageView == null ? 0 : article.pageView
             }}</span>
           <span style="color: #20a0ff;margin-right:20px;font-size: 12px;">
-            {{ article.publish_time }}
+            {{ article.publishDate }}
           </span>
           <el-tag type="success" :key="tag" size="small"
                   style="margin-left: 8px">{{ article.tags }}

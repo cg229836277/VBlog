@@ -15,4 +15,6 @@ public interface IArticleService {
     ArticleDO getById(String id);
 
     ArticleDataObject getByStatus(int status, int pageIndx, int pageSize);
+
+    List<ArticleDO> getByCategoryId(int categoryId);
 }

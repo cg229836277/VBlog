@@ -15,6 +15,10 @@ public interface CategoryMapper extends BaseMapper<CategoryDO> {
         return selectList(new QueryWrapper<CategoryDO>());
     }
 
+    default List<CategoryDO> selectByParentName(String parentName) {
+        return selectList(new QueryWrapper<CategoryDO>().eq("parent_name", parentName));
+    }
+
     default boolean addCategory(CategoryDO categoryDO) {
         insert(categoryDO);
         return categoryDO.getId() >= 0;

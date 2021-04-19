@@ -94,4 +94,14 @@ public class ArticleController {
             return CommonResult.success(data);
         }
     }
+
+    @RequestMapping(value = "/categoryId/{categoryId}", method = RequestMethod.GET)
+    public CommonResult<List<ArticleDO>> getArticleByCategoryId(@PathVariable int categoryId) {
+        List<ArticleDO> data = iArticleService.getByCategoryId(categoryId);
+        if (data == null) {
+            return CommonResult.error(CRUDResultEnum.GET_ARTICLE_FAIL);
+        } else {
+            return CommonResult.success(data);
+        }
+    }
 }

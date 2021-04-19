@@ -38,6 +38,11 @@ public class ArticleServiceImpl implements IArticleService {
     }
 
     @Override
+    public List<ArticleDO> getByCategoryId(int categoryId) {
+        return articleRepository.getByCategoryId(categoryId);
+    }
+
+    @Override
     public ArticleDO getById(String id) {
         return articleRepository.getById(id);
     }

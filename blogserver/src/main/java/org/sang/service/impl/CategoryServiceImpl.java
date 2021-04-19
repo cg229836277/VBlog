@@ -20,6 +20,11 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
+    public List<CategoryDO> getByParentName(String parentName) {
+        return categoryMapper.selectByParentName(parentName);
+    }
+
+    @Override
     public boolean addCategory(CategoryDO categoryDO) {
         return categoryMapper.addCategory(categoryDO);
     }

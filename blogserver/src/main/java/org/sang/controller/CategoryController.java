@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -26,6 +25,16 @@ public class CategoryController {
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public CommonResult<List<CategoryDO>> getCategories() {
         List<CategoryDO> categoryDOList = iCategoryService.getAllCategories();
+        if (categoryDOList == null || categoryDOList.size() == 0) {
+            return CommonResult.error(CRUDResultEnum.GET_CATEGORY_FAIL);
+        } else {
+            return CommonResult.success(categoryDOList);
+        }
+    }
+
+    @RequestMapping(value = "/{parentName}", method = RequestMethod.GET)
+    public CommonResult<List<CategoryDO>> getByParentName(@PathVariable String parentName) {
+        List<CategoryDO> categoryDOList = iCategoryService.getByParentName(parentName);
         if (categoryDOList == null || categoryDOList.size() == 0) {
             return CommonResult.error(CRUDResultEnum.GET_CATEGORY_FAIL);
         } else {

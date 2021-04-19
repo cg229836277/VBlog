@@ -58,4 +58,12 @@ public class ArticleRepository extends BaseRepository<ArticleDO> {
         articleDataObject.setPageSize(totalPageSize);
         return articleDataObject;
     }
+
+    public List<ArticleDO> getByCategoryId(int categoryId) {
+        Query articleDynamicQuery = Query.query(Criteria.where("category_id").is(categoryId));
+        Sort sort = Sort.by(Sort.Direction.DESC, "publish_date");
+        articleDynamicQuery.with(sort);
+        List<ArticleDO> items = mongoTemplate.find(articleDynamicQuery, ArticleDO.class, collectionName);
+        return items;
+    }
 }
