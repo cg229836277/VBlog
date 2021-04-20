@@ -1,34 +1,74 @@
 <template>
-  <el-container direction="vertical" style="height: 100%;">
-    <div style="text-align: left;">
-      <el-button type="text" icon="el-icon-back" @click="goBack" class="back_button">返回
-      </el-button>
-    </div>
-    <el-container direction="horizontal">
-      <keep-alive>
-        <el-aside class="content_aside">
-          <template v-for="(childItem, index) in categories" class="category_menu_parent">
-            <el-button plain :key="index" @click="getArticleForCategory(childItem.id)">{{
-                childItem.childName
-              }}
-            </el-button>
-          </template>
-          <el-menu default-active="0" background-color="transparent">
-            <template v-for="(contentItem, index) in articles">
-              <el-menu-item :key="index">
-                <el-link type="primary" :key="index" @click="articleTitleClicked(index)">{{
-                    contentItem.title
-                  }}
-                </el-link>
-              </el-menu-item>
+  <el-container direction="vertical" class="document-main">
+    <!--    <div style="text-align: left;">-->
+    <!--      <el-button type="text" icon="el-icon-back" @click="goBack" class="back_button">返回-->
+    <!--      </el-button>-->
+    <!--    </div>-->
+    <!--    <el-container direction="horizontal">-->
+    <!--      <keep-alive>-->
+    <!--        <el-aside class="content_aside">-->
+    <!--          <template v-for="(childItem, index) in categories" class="category_menu_parent">-->
+    <!--            <el-button plain :key="index" @click="getArticleForCategory(childItem.id)">{{-->
+    <!--                childItem.childName-->
+    <!--              }}-->
+    <!--            </el-button>-->
+    <!--          </template>-->
+    <!--          <el-menu default-active="0" background-color="transparent">-->
+    <!--            <template v-for="(contentItem, index) in articles">-->
+    <!--              <el-menu-item :key="index">-->
+    <!--                <el-link type="primary" :key="index" @click="articleTitleClicked(index)">{{-->
+    <!--                    contentItem.title-->
+    <!--                  }}-->
+    <!--                </el-link>-->
+    <!--              </el-menu-item>-->
+    <!--            </template>-->
+    <!--          </el-menu>-->
+    <!--        </el-aside>-->
+    <!--      </keep-alive>-->
+    <!--      <div class="divider_view"></div>-->
+    <!--          <div class="html_content" v-html="articles[activeArticleIndex].content">-->
+    <!--          </div>-->
+    <!--    </el-container>-->
+    <header class="header">
+      <a class="logo" href="/">
+        <img src="../images/logo.png" alt="Chuck的主页">
+      </a>
+      <ul class="header-nav">
+        <li>
+          <form class="header-search-form">
+            <input type="text" id="search-query-nav" class="header-search" aria-label="搜索" autocomplete="off"
+                   spellcheck="false" role="combobox" aria-autocomplete="list" aria-expanded="false"
+                   aria-owns="algolia-autocomplete-listbox-0" dir="auto" style="">
+            <pre aria-hidden="true"
+                 style="position: absolute; visibility: hidden; white-space: pre; font-family: Arial; font-size: 13.3333px; font-style: normal; font-variant: normal; font-weight: 400; word-spacing: 0px; letter-spacing: normal; text-indent: 0px; text-rendering: auto; text-transform: none;"></pre>
+          </form>
+        </li>
+      </ul>
+    </header>
+    <div id="main" class="fix-sidebar">
+      <div class="sidebar">
+        <h3>
+
+          分类
+
+          <select class="category-select" v-model="selected" @change="categoryOnChanged($event)">
+            <template v-for="(childItem, index) in categories">
+              <option :value="index" :key="index">{{ childItem.childName }}
+              </option>
             </template>
-          </el-menu>
-        </el-aside>
-      </keep-alive>
-      <div class="divider_view"></div>
-      <div class="html_content" v-html="articles[activeArticleIndex].content">
+          </select>
+        </h3>
+        <ul class="menu-root">
+          <template v-for="(contentItem, index) in articles">
+            <li @click="articleTitleClicked(index)" :key="index">
+              <a data-scroll href="#">{{ contentItem.title }}</a>
+            </li>
+          </template>
+        </ul>
       </div>
-    </el-container>
+      <div class="content api with-sidebar" v-html="articles[activeArticleIndex].content">
+      </div>
+    </div>
   </el-container>
 </template>
 
@@ -42,6 +82,7 @@ export default {
       itemName: '',
       itemId: '',
       activeArticleIndex: 0,
+      selected: 0,
       categories: [],
       articles: [],
     }
@@ -82,6 +123,11 @@ export default {
         }
       })
     },
+    categoryOnChanged (event) {
+      let selectedIndex = event.target.value
+      console.log('selectedIndex:' + selectedIndex)
+      this.getArticleForCategory(this.categories[selectedIndex].id)
+    },
     getArticleForCategory (categoryId) {
       let _this = this
       _this.loading = true
@@ -116,34 +162,170 @@ export default {
 </script>
 
 <style scoped>
-.back_button {
-  font-size: 1em;
+.document-main {
+  padding-top: 61px;
+}
+
+#main.fix-sidebar {
+  position: static;
+}
+
+#main {
+  position: relative;
+  z-index: 1;
+  padding: 0 60px 30px;
+  overflow-x: hidden;
+}
+
+#main.fix-sidebar .sidebar {
+  position: fixed;
+  width: 260px;
+  /* 上边 | 右边 | 下边 | 左边 */
+  padding: 35px 0px 60px 20px;
+}
+
+.sidebar {
+  position: absolute;
+  z-index: 10;
+  top: 61px;
+  left: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+}
+
+.sidebar .menu-root {
+  padding-left: 0;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  margin: 0;
+  line-height: 1.5em;
   padding-left: 1em;
-  padding-top: 2em;
-  padding-bottom: 2em;
 }
 
-.content_aside {
+.sidebar li {
+  margin-top: 0.5em;
+}
+
+a {
+  text-decoration: none;
+  color: #304455;
+}
+
+a:-webkit-any-link {
+  color: -webkit-link;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 1300px) {
+  .content.with-sidebar {
+    margin-left: 290px;
+  }
+}
+
+/*.content {*/
+/*position: relative;*/
+/*max-width: 700px;*/
+/*bottom: 0;*/
+/*margin: 0 auto;*/
+/*!* 上边 | 右边 | 下边 | 左边 *!*/
+/*padding: 35px 0 35px 50px;*/
+/*top: 61px;*/
+/*overflow-x: hidden;*/
+/*overflow-y: auto;*/
+/*-webkit-overflow-scrolling: touch;*/
+/*-ms-overflow-style: none;*/
+/*}*/
+.content {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  /*!* 上边 | 右边 | 下边 | 左边 *!*/
+  padding: 35px 0 35px 50px;
+}
+
+.header {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  box-shadow: 0 0 1px rgb(0 0 0);
+  transition: background-color 0.3s ease-in-out;
   background-color: transparent;
-  width: 30%;
-  height: 100%;
-  overflow: auto;
-  padding-left: 1.5em;
+  height: 40px;
+  padding: 10px 60px;
+  z-index: 20;
 }
 
-.category_menu_parent {
-  padding-top: 1.5em;
+@media screen and (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
 }
 
-.html_content {
-  text-align: left;
-  width: 60%;
-  height: 100%;
-  padding-left: 1.5em;
+.logo {
+  display: inline-block;
+  font-size: 1.5em;
+  line-height: 40px;
+  color: #273849;
+  font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  text-decoration: none;
 }
 
-.divider_view {
-  width: 0.2em;
-  background-color: beige;
+.header-search {
+  height: 30px;
+  line-height: 30px;
+  box-sizing: border-box;
+  padding: 0 15px 0 30px;
+  border: 1px solid #e3e3e3;
+  color: #273849;
+  outline: none;
+  border-radius: 15px;
+  margin-right: 10px;
+  transition: border-color 0.2s ease;
+  background: #fff url(../images/search.svg) 8px 5px no-repeat;
+  background-size: 20px;
+  vertical-align: middle !important;
+}
+
+.logo img {
+  vertical-align: middle;
+  margin-right: 6px;
+  width: 40px;
+  height: 40px;
+  border: none;
+}
+
+.header-nav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  right: 30px;
+  top: 10px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.header-nav li {
+  display: inline-block;
+  position: relative;
+  margin: 0 0.6em;
+}
+
+pre {
+  font-family: "Roboto Mono", Monaco, courier, monospace;
+  font-size: 0.85em;
+  background-color: #f8f8f8;
+  -webkit-font-smoothing: initial;
+  -moz-osx-font-smoothing: initial;
+  border-radius: 2px;
+  position: relative;
+
 }
 </style>
