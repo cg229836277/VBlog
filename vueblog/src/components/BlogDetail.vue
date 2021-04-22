@@ -19,9 +19,11 @@
           <span style="color: #20a0ff;margin-right:20px;font-size: 12px;">
             {{ article.publishDate }}
           </span>
-          <el-tag type="success" :key="tag" size="small"
-                  style="margin-left: 8px">{{ article.tags }}
-          </el-tag>
+          <template v-for="(value,index) in article.tags">
+            <el-tag type="success" :key="index" size="small" style="margin-left: 8px">
+              {{ value }}
+            </el-tag>
+          </template>
           <span style="margin:0px 50px 0px 0px"></span>
         </div>
       </div>

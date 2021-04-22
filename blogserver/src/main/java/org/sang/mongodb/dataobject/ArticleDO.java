@@ -61,4 +61,7 @@ public class ArticleDO {
     @JsonProperty("category_id")
     public int categoryId;
 
+    @Transient
+    public String[] ids;
+
 }

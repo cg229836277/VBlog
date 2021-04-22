@@ -59,7 +59,7 @@ import { mavonEditor } from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import { isNotNullORBlank } from '../utils/utils'
 
-import { STATUS_STORED } from '../constant/status'
+import { STATUS_PUBLISHED } from '../constant/status'
 import { formatCurDate } from '../utils/date'
 
 export default {
@@ -68,7 +68,7 @@ export default {
     var from = this.$route.query.from
     this.from = from
     var _this = this
-    if (from != null && from != '' && from != undefined) {
+    if (from) {
       var id = this.$route.query.id
       this.id = id
       this.loading = true
@@ -114,12 +114,12 @@ export default {
       _this.loading = true
       postRequest('/article/upload', {
         title: _this.article.title,
-        content: state == STATUS_STORED ? _this.$refs.md.d_render : _this.article.mdContent,
+        content: state == STATUS_PUBLISHED ? _this.$refs.md.d_render : _this.article.mdContent,
         // htmlContent: _this.$refs.md.d_render,
         status: state,
         tags: _this.article.dynamicTags,
         author: _this.$store.getters.getUserName,
-        publish_date: _this.formatDate(new Date()),
+        publish_date: formatCurDate(),
         type: _this.article.type,
         create_time: _this.article.create_time.length > 0 ? _this.article.create_time : formatCurDate(),
         category_id: this.getCategoryId(),

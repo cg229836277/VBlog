@@ -89,7 +89,7 @@
 import { putRequest } from '../utils/api'
 import { getRequest } from '../utils/api'
 import { STATUS_ALL } from '../constant/status'
-import { STATUS_STORED } from '../constant/status'
+import { STATUS_PUBLISHED } from '../constant/status'
 import { STATUS_UNFINISHED } from '../constant/status'
 import { STATUS_DELETED } from '../constant/status'
 
@@ -137,20 +137,10 @@ export default {
       this.loadBlogs()
     },
     loadBlogs () {
-      var _this = this
+      let _this = this
       let url = '/article/status'
-      var status = STATUS_ALL
-      // console.log('current state is ' + this.state)
-      if (this.state == -1) {
-        status = STATUS_ALL
-      } else if (this.state == 1) {
-        status = STATUS_STORED
-      } else if (this.state == 0) {
-        status = STATUS_UNFINISHED
-      } else if (this.state == 2) {
-        status = STATUS_DELETED
-      }
-      console.log('current status is ' + status)
+      let status = this.state
+      console.log('current state is ' + this.state)
       getRequest(url, { status: status, pageIndex: _this.currentPage, pageSize: _this.pageSize }).then(response => {
         _this.loading = false
         let articleJson = response.data
@@ -192,7 +182,7 @@ export default {
         type: 'warning'
       }).then(() => {
         _this.loading = true
-        putRequest('/article/restore', { articleId: row.id }).then(resp => {
+        putRequest('/article/update_status', { ids: [row.id], status: STATUS_PUBLISHED }).then(resp => {
           if (resp.status === 200) {
             var data = resp.data
             _this.$message({ type: data.status, message: data.msg })
@@ -213,25 +203,26 @@ export default {
     },
     deleteToDustBin (state) {
       var _this = this
-      this.$confirm(state !== 2 ? '将该文件放入回收站，是否继续?' : '永久删除该文件, 是否继续?', '提示', {
+      this.$confirm(state != STATUS_DELETED ? '将该文件放入回收站，是否继续?' : '永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         _this.loading = true
         var url = ''
-        if (_this.state === -2) {
-          url = '/admin/article/dustbin'
+        var bodyData = {}
+        if (_this.state === STATUS_DELETED) {
+          url = '/article/delete'
+          bodyData = { ids: _this.dustbinData }
         } else {
-          url = '/article/dustbin'
+          url = '/article/update_status'
+          bodyData = { ids: _this.dustbinData, status: STATUS_UNFINISHED }
         }
-        putRequest(url, { aids: _this.dustbinData, state: state }).then(resp => {
-          if (resp.status === 200) {
-            var data = resp.data
-            _this.$message({ type: data.status, message: data.msg })
-            if (data.status === 'success') {
-              window.bus.$emit('blogTableReload')//通过选项卡都重新加载数据
-            }
+        putRequest(url, bodyData).then(resp => {
+          let respData = resp.data
+          if (respData && respData.code == 0) {
+            _this.$message({ type: respData.code, message: respData.message })
+            window.bus.$emit('blogTableReload')//通过选项卡都重新加载数据
           } else {
             _this.$message({ type: 'error', message: '删除失败!' })
           }

@@ -3,8 +3,9 @@ package org.sang.exception;
 public enum CRUDResultEnum {
     //文章处理相关
     UPDATE_ARTICLE_FAIL(1001004001, "文章更新失败"),
-
     GET_ARTICLE_FAIL(1001004002, "文章获取失败"),
+    DELETE_ARTICLE_FAIL(1001004003, "删除文章失败"),
+    RESTORE_ARTICLE_FAIL(1001004004, "恢复文章失败"),
 
 
     //文章栏目处理相关

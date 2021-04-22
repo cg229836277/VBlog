@@ -1,6 +1,7 @@
 package org.sang.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.sang.config.utils.StringUtils;
 import org.sang.dataobject.CategoryDO;
 import org.sang.exception.CRUDResultEnum;
 import org.sang.service.ICategoryService;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,6 +28,22 @@ public class ArticleController {
 
     @Autowired
     IArticleService iArticleService;
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/delete/ids", method = RequestMethod.POST)
+    public CommonResult deleteArticle(@RequestBody ArticleDO articleDO) {
+        if (articleDO == null) {
+            log.info("articleDO is null");
+            return CommonResult.error(CRUDResultEnum.DELETE_ARTICLE_FAIL);
+        }
+        log.info("id is " + Arrays.toString(articleDO.getIds()));
+        boolean result = iArticleService.deleteArticle(articleDO.getIds());
+        if (!result) {
+            return CommonResult.error(CRUDResultEnum.DELETE_ARTICLE_FAIL);
+        } else {
+            return CommonResult.success();
+        }
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -68,6 +86,22 @@ public class ArticleController {
     public CommonResult updateArticle(@RequestBody ArticleDO article) {
         ArticleDO data = iArticleService.update(article);
         if (data == null) {
+            return CommonResult.error(CRUDResultEnum.UPDATE_ARTICLE_FAIL);
+        } else {
+            return CommonResult.success();
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/update_status", method = RequestMethod.POST)
+    public CommonResult updateArticleByIds(@RequestBody ArticleDO article) {
+        if (article == null) {
+            log.info("articleDO is null");
+            return CommonResult.error(CRUDResultEnum.UPDATE_ARTICLE_FAIL);
+        }
+        log.info("id is " + Arrays.toString(article.getIds()));
+        boolean result = iArticleService.updateStatusByIds(article.getIds(), article.getStatus());
+        if (!result) {
             return CommonResult.error(CRUDResultEnum.UPDATE_ARTICLE_FAIL);
         } else {
             return CommonResult.success();

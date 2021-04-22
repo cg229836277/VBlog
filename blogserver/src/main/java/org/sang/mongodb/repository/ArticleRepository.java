@@ -1,10 +1,13 @@
 package org.sang.mongodb.repository;
 
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import org.sang.vo.ArticleDataObject;
 import org.sang.mongodb.dataobject.ArticleDO;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +17,20 @@ import java.util.List;
 public class ArticleRepository extends BaseRepository<ArticleDO> {
 
     private final String collectionName = "article";
+
+    public boolean deleteByIds(String[] ids) {
+        Query query = Query.query(Criteria.where("_id").in(ids));
+        DeleteResult result = mongoTemplate.remove(query, ArticleDO.class, collectionName);
+        return result.getDeletedCount() > 0;
+    }
+
+    public boolean updateByIds(String[] ids, int status) {
+        Query query = Query.query(Criteria.where("_id").in(ids));
+        Update update = new Update();
+        update.set("status", status);
+        UpdateResult result = mongoTemplate.updateMulti(query, update, ArticleDO.class, collectionName);
+        return result.getModifiedCount() > 0;
+    }
 
     public ArticleDO getById(String id) {
         Query articleQuery = Query.query(Criteria.where("_id").is(Long.parseLong(id)));

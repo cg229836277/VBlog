@@ -17,4 +17,8 @@ public interface IArticleService {
     ArticleDataObject getByStatus(int status, int pageIndx, int pageSize);
 
     List<ArticleDO> getByCategoryId(int categoryId);
+
+    boolean deleteArticle(String[] ids);
+
+    boolean updateStatusByIds(String[] ids, int status);
 }

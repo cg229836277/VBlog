@@ -43,7 +43,17 @@ public class ArticleServiceImpl implements IArticleService {
     }
 
     @Override
+    public boolean deleteArticle(String[] ids) {
+        return articleRepository.deleteByIds(ids);
+    }
+
+    @Override
     public ArticleDO getById(String id) {
         return articleRepository.getById(id);
+    }
+
+    @Override
+    public boolean updateStatusByIds(String[] ids, int status) {
+        return articleRepository.updateByIds(ids, status);
     }
 }
