@@ -122,11 +122,7 @@ public class ArticleController {
         }
         log.info("defaultStatus:" + defaultStatus + ",defaultPageIndex:" + defaultPageIndex + ",defaultPageSize:" + defaultPageSize);
         ArticleDataObject data = iArticleService.getByStatus(defaultStatus, defaultPageIndex, defaultPageSize);
-        if (data == null) {
-            return CommonResult.error(CRUDResultEnum.GET_ARTICLE_FAIL);
-        } else {
-            return CommonResult.success(data);
-        }
+        return CommonResult.success(data);
     }
 
     @RequestMapping(value = "/categoryId/{categoryId}", method = RequestMethod.GET)

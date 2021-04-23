@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { putRequest } from '../utils/api'
+import { postRequest, putRequest } from '../utils/api'
 import { getRequest } from '../utils/api'
 import { STATUS_ALL } from '../constant/status'
 import { STATUS_PUBLISHED } from '../constant/status'
@@ -128,7 +128,7 @@ export default {
       for (var i = 0; i < selItems.length; i++) {
         this.dustbinData.push(selItems[i].id)
       }
-      this.deleteToDustBin(selItems[0].state)
+      this.deleteToDustBin()
     },
     //翻页
     currentChange (currentPage) {
@@ -144,16 +144,23 @@ export default {
       getRequest(url, { status: status, pageIndex: _this.currentPage, pageSize: _this.pageSize }).then(response => {
         _this.loading = false
         let articleJson = response.data
-        if (articleJson != null && articleJson.code === 0) {
-          let articleData = articleJson.data.articleDOList
-          _this.articles = articleData
-          _this.totalCount = articleData.pageSize
+        console.log('/article/status status is ' + status)
+        if (articleJson && articleJson.code == 0) {
+          if (articleJson.data) {
+            let articleData = articleJson.data.articleDOList
+            _this.articles = articleData
+            _this.totalCount = articleData.pageSize
+          } else {
+            _this.currentPage = 1
+            _this.articles = []
+            _this.totalCount = 0
+          }
         } else {
           _this.$message({ type: 'error', message: '数据加载失败!' })
         }
       }, response => {
         _this.loading = false
-        if (response.response.status === 403) {
+        if (response.response.status == 403) {
           _this.$message({ type: 'error', message: response.response.data })
         } else {
           _this.$message({ type: 'error', message: '数据加载失败!' })
@@ -172,7 +179,7 @@ export default {
     },
     handleDelete (index, row) {
       this.dustbinData.push(row.id)
-      this.deleteToDustBin(row.state)
+      this.deleteToDustBin()
     },
     handleRestore (index, row) {
       let _this = this
@@ -183,9 +190,9 @@ export default {
       }).then(() => {
         _this.loading = true
         putRequest('/article/update_status', { ids: [row.id], status: STATUS_PUBLISHED }).then(resp => {
-          if (resp.status === 200) {
-            var data = resp.data
-            _this.$message({ type: data.status, message: data.msg })
+          let responseData = resp.data
+          if (responseData && responseData.code == 0) {
+            _this.$message({ type: responseData.code, message: responseData.message })
             if (data.status === 'success') {
               window.bus.$emit('blogTableReload')//通过选项卡都重新加载数据
             }
@@ -201,24 +208,25 @@ export default {
         })
       })
     },
-    deleteToDustBin (state) {
+    deleteToDustBin () {
       var _this = this
-      this.$confirm(state != STATUS_DELETED ? '将该文件放入回收站，是否继续?' : '永久删除该文件, 是否继续?', '提示', {
+      let status = this.state
+      this.$confirm(status == STATUS_DELETED ? '永久删除该文件, 是否继续?' : '将该文件放入回收站，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         _this.loading = true
         var url = ''
-        var bodyData = {}
-        if (_this.state === STATUS_DELETED) {
-          url = '/article/delete'
+        var bodyData
+        if (status == STATUS_DELETED) {
+          url = '/article/delete/ids'
           bodyData = { ids: _this.dustbinData }
         } else {
           url = '/article/update_status'
-          bodyData = { ids: _this.dustbinData, status: STATUS_UNFINISHED }
+          bodyData = { ids: _this.dustbinData, status: STATUS_DELETED }
         }
-        putRequest(url, bodyData).then(resp => {
+        postRequest(url, bodyData).then(resp => {
           let respData = resp.data
           if (respData && respData.code == 0) {
             _this.$message({ type: respData.code, message: respData.message })
@@ -226,8 +234,8 @@ export default {
           } else {
             _this.$message({ type: 'error', message: '删除失败!' })
           }
-          _this.loading = false
           _this.dustbinData = []
+          _this.loading = false
         }, resp => {
           _this.loading = false
           _this.$message({ type: 'error', message: '删除失败!' })

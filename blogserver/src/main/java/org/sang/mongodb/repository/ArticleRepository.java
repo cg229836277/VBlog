@@ -1,10 +1,12 @@
 package org.sang.mongodb.repository;
 
+import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.sang.vo.ArticleDataObject;
 import org.sang.mongodb.dataobject.ArticleDO;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -19,16 +21,26 @@ public class ArticleRepository extends BaseRepository<ArticleDO> {
     private final String collectionName = "article";
 
     public boolean deleteByIds(String[] ids) {
-        Query query = Query.query(Criteria.where("_id").in(ids));
-        DeleteResult result = mongoTemplate.remove(query, ArticleDO.class, collectionName);
+        BulkOperations operations = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, collectionName);
+        for (String tempId : ids) {
+            Query queryUpdate = new Query();
+            queryUpdate.addCriteria(Criteria.where("_id").is(Long.parseLong(tempId)));
+            operations.remove(queryUpdate);
+        }
+        BulkWriteResult result = operations.execute();
         return result.getDeletedCount() > 0;
     }
 
     public boolean updateByIds(String[] ids, int status) {
-        Query query = Query.query(Criteria.where("_id").in(ids));
-        Update update = new Update();
-        update.set("status", status);
-        UpdateResult result = mongoTemplate.updateMulti(query, update, ArticleDO.class, collectionName);
+        BulkOperations operations = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, collectionName);
+        for (String tempId : ids) {
+            Query queryUpdate = new Query();
+            queryUpdate.addCriteria(Criteria.where("_id").is(Long.parseLong(tempId)));
+            Update update = new Update();
+            update.set("status", status);
+            operations.updateOne(queryUpdate, update);
+        }
+        BulkWriteResult result = operations.execute();
         return result.getModifiedCount() > 0;
     }
 
