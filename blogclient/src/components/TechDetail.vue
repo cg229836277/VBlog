@@ -66,18 +66,23 @@
           </template>
         </ul>
       </div>
-      <div class="content api with-sidebar" v-html="articles[activeArticleIndex].content">
+      <div class="content api with-sidebar markdown-body">
+        <h1 class="article-title">{{ articles[activeArticleIndex].title }}</h1>
+        <p class="article-author">作者：{{ articles[activeArticleIndex].author }}</p>
+        <p class="article-publish-date">发布时间：{{ articles[activeArticleIndex].publish_date }}</p>
+        <div v-html="articles[activeArticleIndex].content"></div>
       </div>
     </div>
   </el-container>
 </template>
 
 <script>
-import { getRequest } from '@/net'
+import {getRequest} from '@/net'
+import 'github-markdown-css'
 
 export default {
   name: 'TechDetail',
-  data () {
+  data() {
     return {
       itemName: '',
       itemId: '',
@@ -88,17 +93,17 @@ export default {
     }
   },
   methods: {
-    goBack () {
+    goBack() {
       this.$router.go(-1)
     },
-    initItemName () {
+    initItemName() {
       let pageParameters = this.$route.params
       this.itemName = pageParameters.item_name
       this.itemId = pageParameters.item_id
       console.log('item_name=' + this.itemName)
       this.getCurrentChildCategory()
     },
-    getCurrentChildCategory () {
+    getCurrentChildCategory() {
       let _this = this
       _this.loading = true
       getRequest('/category/' + this.itemName).then(resp => {
@@ -123,12 +128,12 @@ export default {
         }
       })
     },
-    categoryOnChanged (event) {
+    categoryOnChanged(event) {
       let selectedIndex = event.target.value
       console.log('selectedIndex:' + selectedIndex)
       this.getArticleForCategory(this.categories[selectedIndex].id)
     },
-    getArticleForCategory (categoryId) {
+    getArticleForCategory(categoryId) {
       let _this = this
       _this.loading = true
       getRequest('/article/categoryId/' + categoryId).then(resp => {
@@ -151,11 +156,11 @@ export default {
         }
       })
     },
-    articleTitleClicked (index) {
+    articleTitleClicked(index) {
       this.activeArticleIndex = index
     }
   },
-  mounted () {
+  mounted() {
     this.initItemName()
   },
 }
@@ -228,19 +233,6 @@ a:-webkit-any-link {
   }
 }
 
-/*.content {*/
-/*position: relative;*/
-/*max-width: 700px;*/
-/*bottom: 0;*/
-/*margin: 0 auto;*/
-/*!* 上边 | 右边 | 下边 | 左边 *!*/
-/*padding: 35px 0 35px 50px;*/
-/*top: 61px;*/
-/*overflow-x: hidden;*/
-/*overflow-y: auto;*/
-/*-webkit-overflow-scrolling: touch;*/
-/*-ms-overflow-style: none;*/
-/*}*/
 .content {
   position: relative;
   max-width: 700px;
@@ -249,13 +241,18 @@ a:-webkit-any-link {
   padding: 35px 0 35px 50px;
 }
 
+.article-title, .article-author, .article-publish-date {
+  width: 100%;
+  text-align: center;
+}
+
 .header {
   position: fixed;
   width: 100%;
   top: 0;
   box-shadow: 0 0 1px rgb(0 0 0);
   transition: background-color 0.3s ease-in-out;
-  background-color: transparent;
+  background-color: #dbdbdb;
   height: 40px;
   padding: 10px 60px;
   z-index: 20;

@@ -7,7 +7,6 @@ import Reading from '@/components/Reading'
 import MusicList from '@/components/MusicList'
 import About from '@/components/About'
 import TechDetail from '@/components/TechDetail'
-import TechDetailContent from '@/components/TechDetailContent'
 
 Vue.use(Router)
 
