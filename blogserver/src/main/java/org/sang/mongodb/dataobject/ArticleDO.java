@@ -15,7 +15,7 @@ import java.util.Date;
 @Document(collection = "article")
 @Data
 public class ArticleDO {
-
+    public static final int STATUS_ABOUT_ARTICLE = 3;
     public static final int STATUS_ALL = 2;
     public static final int STATUS_STORED = 0;
     public static final int STATUS_UNFINISHED = 1;
@@ -44,7 +44,11 @@ public class ArticleDO {
      */
     public String type;
 
-    public String content;
+    @Field("origin_content")
+    public String originContent;
+
+    @Field("html_content")
+    public String htmlContent;
 
     @Field("publish_date")
     @JsonProperty("publish_date")

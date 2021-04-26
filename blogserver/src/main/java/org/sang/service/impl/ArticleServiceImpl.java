@@ -23,8 +23,8 @@ public class ArticleServiceImpl implements IArticleService {
     }
 
     @Override
-    public ArticleDO update(ArticleDO data) {
-        return articleRepository.update(data, collectionName);
+    public boolean update(ArticleDO data) {
+        return articleRepository.updateArticle(data);
     }
 
     @Override
@@ -55,5 +55,10 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     public boolean updateStatusByIds(String[] ids, int status) {
         return articleRepository.updateByIds(ids, status);
+    }
+
+    @Override
+    public ArticleDO getByTitle(String title) {
+        return articleRepository.getByTitle(title);
     }
 }

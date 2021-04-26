@@ -1,7 +1,6 @@
 package org.sang.mongodb.repository;
 
 import com.mongodb.bulk.BulkWriteResult;
-import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.sang.vo.ArticleDataObject;
 import org.sang.mongodb.dataobject.ArticleDO;
@@ -31,6 +30,23 @@ public class ArticleRepository extends BaseRepository<ArticleDO> {
         return result.getDeletedCount() > 0;
     }
 
+    public boolean updateArticle(ArticleDO item) {
+        Query queryUpdate = new Query();
+        queryUpdate.addCriteria(Criteria.where("_id").is(item.getId()));
+        Update update = new Update();
+        update.set("status", item.getStatus());
+        update.set("author", item.getAuthor());
+        update.set("title", item.getTitle());
+        update.set("type", item.getType());
+        update.set("origin_content", item.getOriginContent());
+        update.set("html_content", item.getHtmlContent());
+        update.set("publish_date", item.getPublishDate());
+        update.set("tags", item.getTags());
+        update.set("category_id", item.getCategoryId());
+        UpdateResult result = mongoTemplate.updateFirst(queryUpdate, update, collectionName);
+        return result.getModifiedCount() > 0;
+    }
+
     public boolean updateByIds(String[] ids, int status) {
         BulkOperations operations = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, collectionName);
         for (String tempId : ids) {
@@ -50,9 +66,18 @@ public class ArticleRepository extends BaseRepository<ArticleDO> {
         return items;
     }
 
+    public ArticleDO getByTitle(String title) {
+        Query articleQuery = Query.query(Criteria.where("title").is(title));
+        ArticleDO items = mongoTemplate.findOne(articleQuery, ArticleDO.class, collectionName);
+        return items;
+    }
+
     public ArticleDataObject getByStatus(int status, int pageIndex, int pageSize) {
         if (status == ArticleDO.STATUS_ALL) {
-            List<ArticleDO> items = mongoTemplate.findAll(ArticleDO.class, collectionName);
+            Query articleAllQuery = Query.query(Criteria.where("status").ne(ArticleDO.STATUS_ABOUT_ARTICLE));//.with(pageable)
+            Sort sort = Sort.by(Sort.Direction.DESC, "publish_date");
+            articleAllQuery.with(sort);
+            List<ArticleDO> items = mongoTemplate.find(articleAllQuery, ArticleDO.class, collectionName);
             if (items == null || items.size() == 0) {
                 return null;
             }

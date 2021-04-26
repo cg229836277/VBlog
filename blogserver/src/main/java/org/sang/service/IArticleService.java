@@ -8,9 +8,11 @@ import java.util.List;
 public interface IArticleService {
     ArticleDO insert(ArticleDO data);
 
-    ArticleDO update(ArticleDO data);
+    boolean update(ArticleDO data);
 
     List<ArticleDO> getByType(String type);
+
+    ArticleDO getByTitle(String title);
 
     ArticleDO getById(String id);
 

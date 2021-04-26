@@ -154,7 +154,7 @@ public class BlogserverApplicationTests {
         ArticleDO articleDO = new ArticleDO();
         articleDO.setCreateTime(dateFormat.format(new Date()));
         articleDO.setAuthor("chuckchan");
-        articleDO.setContent("haha");
+        articleDO.setOriginContent("haha");
         articleDO.setPublishDate(dateFormat.format(new Date()));
         articleDO.setSubTitle("flutter demo test");
         articleDO.setSummary("flutter");
@@ -193,7 +193,7 @@ public class BlogserverApplicationTests {
         ArticleDO articleDO = new ArticleDO();
         articleDO.setCreateTime(dateFormat.format(new Date()));
         articleDO.setAuthor("chuckchan");
-        articleDO.setContent("haha");
+        articleDO.setOriginContent("haha");
         articleDO.setPublishDate(dateFormat.format(new Date()));
         articleDO.setSubTitle("flutter demo test");
         articleDO.setSummary("flutter");

@@ -29,7 +29,7 @@
       </div>
     </el-col>
     <el-col>
-      <div style="text-align: left" v-html="article.content">
+      <div style="text-align: left" v-html="article.htmlContent">
       </div>
     </el-col>
   </el-row>

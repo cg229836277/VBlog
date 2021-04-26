@@ -36,7 +36,7 @@
     </el-header>
     <el-main class="main">
       <div id="editor">
-        <mavon-editor style="height: 100%;width: 100%;" ref=md v-model="article.mdContent"></mavon-editor>
+        <mavon-editor style="height: 100%;width: 100%;" ref=md v-model="article.originContent"></mavon-editor>
       </div>
       <div style="display: flex;align-items: center;margin-top: 15px;justify-content: flex-end">
         <el-button @click="cancelEdit" v-if="from!=undefined">放弃修改</el-button>
@@ -58,8 +58,6 @@ import { mavonEditor } from 'mavon-editor'
 // 可以通过 mavonEditor.markdownIt 获取解析器markdown-it对象
 import 'mavon-editor/dist/css/index.css'
 import { isNotNullORBlank } from '../utils/utils'
-
-import { STATUS_PUBLISHED } from '../constant/status'
 import { formatCurDate } from '../utils/date'
 
 export default {
@@ -77,12 +75,14 @@ export default {
         let jsonData = resp.data
         if (jsonData && jsonData.code == 0) {
           let articleData = jsonData.data
-          _this.article.mdContent = articleData.content
+          _this.article.originContent = articleData.originContent
+          _this.article.htmlContent = articleData.htmlContent
           _this.article.title = articleData.title
           _this.article.category_id = articleData.category_id
           _this.article.category_name = articleData.type
           _this.article.create_time = articleData.create_time
           _this.article.dynamicTags = []
+          _this.article.type = articleData.type
 
           let tags = articleData.tags
           let length = tags.length
@@ -106,16 +106,18 @@ export default {
       this.$router.go(-1)
     },
     saveBlog (state) {
-      if (!(isNotNullORBlank(this.article.title, this.article.mdContent))) {
+      if (!(isNotNullORBlank(this.article.title, this.article.originContent))) {
         this.$message({ type: 'error', message: '数据不能为空!' })
         return
       }
       var _this = this
       _this.loading = true
-      postRequest('/article/upload', {
+      let requestUrl = _this.from ? '/article/update' : '/article/upload'
+      postRequest(requestUrl, {
+        id: _this.id,
         title: _this.article.title,
-        content: state == STATUS_PUBLISHED ? _this.$refs.md.d_render : _this.article.mdContent,
-        // htmlContent: _this.$refs.md.d_render,
+        originContent: _this.$refs.md.d_value,//this.$refs.md.d_value
+        htmlContent: _this.$refs.md.d_render,//this.$refs.md.d_render
         status: state,
         tags: _this.article.dynamicTags,
         author: _this.$store.getters.getUserName,
@@ -207,6 +209,7 @@ export default {
   ,
   data () {
     return {
+      id: '',
       categories: [],
       categoryParent: [],
       categoryChild: [],
@@ -217,7 +220,8 @@ export default {
       article: {
         dynamicTags: [],
         title: '',
-        mdContent: '',
+        originContent: '',
+        htmlContent: '',
         create_time: '',
         category_id: '',
         category_name: '',

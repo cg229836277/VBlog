@@ -82,10 +82,21 @@ public class ArticleController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/title/{title}", method = RequestMethod.GET)
+    public CommonResult<ArticleDO> getArticleByTitle(@PathVariable String title) {
+        ArticleDO data = iArticleService.getByTitle(title);
+        if (data == null) {
+            return CommonResult.error(CRUDResultEnum.GET_ARTICLE_FAIL);
+        } else {
+            return CommonResult.success(data);
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public CommonResult updateArticle(@RequestBody ArticleDO article) {
-        ArticleDO data = iArticleService.update(article);
-        if (data == null) {
+        boolean result = iArticleService.update(article);
+        if (!result) {
             return CommonResult.error(CRUDResultEnum.UPDATE_ARTICLE_FAIL);
         } else {
             return CommonResult.success();

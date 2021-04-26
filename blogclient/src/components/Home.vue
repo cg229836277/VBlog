@@ -7,7 +7,7 @@
                    height="96px"/></li>
           <li><p class="aside_name">Chuck Chan</p></li>
           <li><img class="aside_img" src="../../public/assets/motto.svg" width="24em" height="24em"/>
-            <p>水清，濯吾缨；水浊，濯吾足。</p>
+            <p>海纳百川，有容乃大<br/>壁立千仞，无欲则刚</p>
           </li>
           <li><img class="aside_img" src="../../public/assets/location.svg" width="24em"
                    height="24em"/>
@@ -17,8 +17,21 @@
               1301958187@qq.com
             </a>
           </li>
-          <li><img class="aside_img" src="../../public/assets/wechatblog.svg" width="24em"
-                   height="24em"/><a href="../../public/assets/wechat.svg">Android部落格</a>
+          <li>
+            <el-popover
+                placement="top"
+                width="160"
+                trigger="hover"
+                v-model="visible">
+              <div>
+                <img src="../../public/assets/wechat.svg"/>
+              </div>
+              <div slot="reference" class="popover-parent">
+                <img class="aside_img" src="../../public/assets/wechatblog.svg" width="24em"
+                     height="24em"/>
+                <a href="#">Android部落格</a>
+              </div>
+            </el-popover>
           </li>
           <li><img class="aside_img" src="../../public/assets/link.svg" width="24em" height="24em"/><a
               href="https://chengang.plus">个人网站</a></li>
@@ -34,7 +47,8 @@
                         v-if="item.children && item.children.length > 1 && item.children[0].menu_item"
                         class="header-el-submenu-life">
               <template slot="title">{{ item.name }}</template>
-              <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path">
+              <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path"
+                            style="background-color: #dbdbdb;">
                 {{ child.name }}
               </el-menu-item>
             </el-submenu>
@@ -57,14 +71,14 @@
 export default {
   name: 'Home',
   methods: {
-    handleItemSelect(key, keyPath) {
+    handleItemSelect (key, keyPath) {
       console.log(key, keyPath)
     },
-    handleTabItemCommand(command) {
+    handleTabItemCommand (command) {
       console.log(command)
     },
   },
-  data() {
+  data () {
     return {
       activeIndex: '/tech',
     }
@@ -74,7 +88,7 @@ export default {
 
 <style scoped>
 
-#aside_container, .category_item_content_container,.parent_content {
+#aside_container, .category_item_content_container, .parent_content {
   height: 100%;
 }
 
@@ -124,5 +138,10 @@ export default {
 .aside_list li a {
   margin: auto 0;
   padding-left: 0.5em;
+}
+
+.popover-parent {
+  display: flex;
+  align-items: center;
 }
 </style>
