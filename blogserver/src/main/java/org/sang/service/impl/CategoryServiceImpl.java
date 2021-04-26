@@ -1,15 +1,19 @@
 package org.sang.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.sang.dataobject.CategoryDO;
+import org.sang.dataobject.RoleDO;
 import org.sang.mapper.CategoryMapper;
+import org.sang.mapper.RoleMapper;
 import org.sang.service.ICategoryService;
+import org.sang.service.IRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class CategoryServiceImpl implements ICategoryService {
+public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, CategoryDO> implements ICategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;

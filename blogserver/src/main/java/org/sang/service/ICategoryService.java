@@ -1,10 +1,11 @@
 package org.sang.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.sang.dataobject.CategoryDO;
 
 import java.util.List;
 
-public interface ICategoryService {
+public interface ICategoryService extends IService<CategoryDO> {
     List<CategoryDO> getAllCategories();
 
     List<CategoryDO> getByParentName(String parentName);

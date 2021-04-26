@@ -5,7 +5,6 @@ import org.sang.exception.ServiceExceptionEnum;
 import org.sang.service.IUsersService;
 import org.sang.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -9,6 +9,7 @@ import PostArticle from '@/components/PostArticle'
 import UserMana from '@/components/UserMana'
 import BlogDetail from '@/components/BlogDetail'
 import EditAbout from '@/components/EditAbout'
+import MusicList from '../components/MusicList'
 
 Vue.use(Router)
 
@@ -104,6 +105,19 @@ export default new Router({
           iconCls: 'fa fa-bar-chart',
           name: '数据统计',
           component: DataCharts
+        }
+      ]
+    }, {
+      path: '/home',
+      component: Home,
+      name: '音乐列表',
+      iconCls: 'fa fa-music',
+      children: [
+        {
+          path: '/musicList',
+          iconCls: 'fa fa-music',
+          name: '音乐列表',
+          component: MusicList
         }
       ]
     }

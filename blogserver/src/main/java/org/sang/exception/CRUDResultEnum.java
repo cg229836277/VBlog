@@ -9,14 +9,18 @@ public enum CRUDResultEnum {
 
 
     //文章栏目处理相关
-    ADD_CATEGORY_FAIL(1001004003, "栏目保存失败"),
+    ADD_CATEGORY_FAIL(1001005001, "栏目保存失败"),
 
-    UPDATE_CATEGORY_FAIL(1001004004, "栏目更新失败"),
+    UPDATE_CATEGORY_FAIL(1001005002, "栏目更新失败"),
 
-    DELETE_CATEGORY_FAIL(1001004005, "栏目删除失败"),
+    DELETE_CATEGORY_FAIL(1001005003, "栏目删除失败"),
 
-    GET_CATEGORY_FAIL(1001004006, "栏目获取失败"),
+    GET_CATEGORY_FAIL(1001005004, "栏目获取失败"),
 
+    //音乐列表相关
+    GET_MUSIC_LIST_FAIL(1001006001, "音乐列表获取失败"),
+    DELETE_MUSIC_LIST_FAIL(1001006002, "音乐删除失败"),
+    ADD_MUSIC_LIST_FAIL(1001006003, "音乐添加失败"),
     ;
 
     /**

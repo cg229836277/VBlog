@@ -78,11 +78,11 @@ CREATE TABLE `users`
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories`
 (
-    `id`          bigint NOT NULL AUTO_INCREMENT,
-    `parent_name` varchar(64) DEFAULT NULL,
-    `child_name`  varchar(64) DEFAULT NULL,
-    `category_desc`        tinytext    DEFAULT NULL,
-    `create_time` datetime    DEFAULT NULL,
+    `id`            bigint NOT NULL AUTO_INCREMENT,
+    `parent_name`   varchar(64) DEFAULT NULL,
+    `child_name`    varchar(64) DEFAULT NULL,
+    `category_desc` tinytext    DEFAULT NULL,
+    `create_time`   datetime    DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 21
@@ -109,3 +109,14 @@ INSERT INTO `categories`
 VALUES (8, '混合开发', 'flutter', '涉及flutter基础知识，包括各种Widget使用实战，自定义flutter Widget，翻译官方技术文档，flutter底层源码解析等。', NULL);
 INSERT INTO `categories`
 VALUES (9, '基础', '数据结构与算法', '目前仅包含了排序和二叉树相关知识，后续会追加LeetCode题目分析。', NULL);
+
+DROP TABLE IF EXISTS `music_list`;
+CREATE TABLE `music_list`
+(
+    `id`          bigint NOT NULL AUTO_INCREMENT,
+    `content`     varchar(300) DEFAULT NULL,
+    `create_time` datetime     DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 21
+  DEFAULT CHARSET = utf8;
