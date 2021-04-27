@@ -1,0 +1,19 @@
+.parent {
+    height: 200px; /* to be more intuitive */
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    background-color: #333333;
+}
+
+.child-1 {
+    align-items: center;
+    height: 100%; /* to be more intuitive */
+    background-color: #aaaaaa;
+}
+
+.child {
+    width: 100%;
+    height: 50%; /* to be more intuitive */
+    background-color: #42b983;
+}

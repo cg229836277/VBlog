@@ -20,14 +20,9 @@ public class MusicListController {
     IMusicListService musicListService;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    @PreAuthorize("hasRole('ADMIN')")
     CommonResult<List<MusicListDO>> getAllMusicList() {
         List<MusicListDO> dataList = musicListService.getAllMusicList();
-        if (dataList == null || dataList.size() == 0) {
-            return CommonResult.error(CRUDResultEnum.GET_MUSIC_LIST_FAIL);
-        } else {
-            return CommonResult.success(dataList);
-        }
+        return CommonResult.success(dataList);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)

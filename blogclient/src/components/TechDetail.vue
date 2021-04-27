@@ -70,7 +70,7 @@
         <h1 class="article-title">{{ articles[activeArticleIndex].title }}</h1>
         <p class="article-author">作者：{{ articles[activeArticleIndex].author }}</p>
         <p class="article-publish-date">发布时间：{{ articles[activeArticleIndex].publish_date }}</p>
-        <div v-html="articles[activeArticleIndex].content"></div>
+        <div v-html="articles[activeArticleIndex].htmlContent"></div>
       </div>
     </div>
   </el-container>

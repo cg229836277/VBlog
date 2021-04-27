@@ -115,6 +115,7 @@ CREATE TABLE `music_list`
 (
     `id`          bigint NOT NULL AUTO_INCREMENT,
     `content`     varchar(300) DEFAULT NULL,
+    `title`       varchar(100) DEFAULT NULL,
     `create_time` datetime     DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB

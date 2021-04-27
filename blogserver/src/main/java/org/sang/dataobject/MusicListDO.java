@@ -7,4 +7,6 @@ import lombok.Data;
 @TableName(value = "music_list")
 public class MusicListDO extends BaseDO {
     public String content;
+
+    public String title;
 }

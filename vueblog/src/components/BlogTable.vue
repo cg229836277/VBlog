@@ -1,13 +1,3 @@
-<style type="text/css">
-.blog_table_footer {
-  display: flex;
-  box-sizing: content-box;
-  padding-top: 10px;
-  padding-bottom: 0px;
-  margin-bottom: 0px;
-  justify-content: space-between;
-}
-</style>
 <template>
   <div>
     <div style="display: flex;justify-content: flex-start">
@@ -86,7 +76,7 @@
 </template>
 
 <script>
-import { postRequest, putRequest } from '../utils/api'
+import { postRequest } from '../utils/api'
 import { getRequest } from '../utils/api'
 import { STATUS_ALL } from '../constant/status'
 import { STATUS_PUBLISHED } from '../constant/status'
@@ -189,13 +179,11 @@ export default {
         type: 'warning'
       }).then(() => {
         _this.loading = true
-        putRequest('/article/update_status', { ids: [row.id], status: STATUS_PUBLISHED }).then(resp => {
+        postRequest('/article/update_status', { ids: [row.id], status: STATUS_PUBLISHED }).then(resp => {
           let responseData = resp.data
           if (responseData && responseData.code == 0) {
             _this.$message({ type: responseData.code, message: responseData.message })
-            if (data.status === 'success') {
-              window.bus.$emit('blogTableReload')//通过选项卡都重新加载数据
-            }
+            window.bus.$emit('blogTableReload')//通过选项卡都重新加载数据
           } else {
             _this.$message({ type: 'error', message: '还原失败!' })
           }
@@ -253,3 +241,14 @@ export default {
   props: ['state', 'showEdit', 'showDelete', 'activeName', 'showRestore']
 }
 </script>
+
+<style type="text/css">
+.blog_table_footer {
+  display: flex;
+  box-sizing: content-box;
+  padding-top: 10px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  justify-content: space-between;
+}
+</style>
