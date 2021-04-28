@@ -81,7 +81,6 @@ public class ArticleController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/title/{title}", method = RequestMethod.GET)
     public CommonResult<ArticleDO> getArticleByTitle(@PathVariable String title) {
         ArticleDO data = iArticleService.getByTitle(title);

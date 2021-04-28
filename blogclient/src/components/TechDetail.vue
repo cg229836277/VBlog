@@ -65,24 +65,37 @@
             </li>
           </template>
         </ul>
+        <div class="aside-divider">
+        </div>
       </div>
       <div class="content api with-sidebar markdown-body">
         <h1 class="article-title">{{ articles[activeArticleIndex].title }}</h1>
         <p class="article-author">作者：{{ articles[activeArticleIndex].author }}</p>
         <p class="article-publish-date">发布时间：{{ articles[activeArticleIndex].publish_date }}</p>
-        <div v-html="articles[activeArticleIndex].htmlContent"></div>
+        <div id="blog-content" v-html="articles[activeArticleIndex].htmlContent"></div>
       </div>
+      <toc-content
+          class="toc-content"
+          :key="activeArticleIndex"
+          v-bind="catalogProps"
+      >
+        <template #default="{level, isActive}">
+          <i :class="['line-style', isActive ? 'line-style--active' : '']"></i>
+        </template>
+      </toc-content>
     </div>
   </el-container>
 </template>
 
 <script>
-import {getRequest} from '@/net'
+import { getRequest } from '@/net'
 import 'github-markdown-css'
+import TocContent from './toc/main'
+// import TocForContent from '@/components/TocForContent'
 
 export default {
   name: 'TechDetail',
-  data() {
+  data () {
     return {
       itemName: '',
       itemId: '',
@@ -90,20 +103,27 @@ export default {
       selected: 0,
       categories: [],
       articles: [],
+      catalogProps: {
+        // 内容容器selector(必需)
+        container: '#blog-content',
+        height: 'calc(100% - 100px)',
+        title: '目录',
+        levelList: ['h1', 'h2', 'h3', 'h4'],
+      }
     }
   },
   methods: {
-    goBack() {
+    goBack () {
       this.$router.go(-1)
     },
-    initItemName() {
+    initItemName () {
       let pageParameters = this.$route.params
       this.itemName = pageParameters.item_name
       this.itemId = pageParameters.item_id
       console.log('item_name=' + this.itemName)
       this.getCurrentChildCategory()
     },
-    getCurrentChildCategory() {
+    getCurrentChildCategory () {
       let _this = this
       _this.loading = true
       getRequest('/category/' + this.itemName).then(resp => {
@@ -128,12 +148,12 @@ export default {
         }
       })
     },
-    categoryOnChanged(event) {
+    categoryOnChanged (event) {
       let selectedIndex = event.target.value
       console.log('selectedIndex:' + selectedIndex)
       this.getArticleForCategory(this.categories[selectedIndex].id)
     },
-    getArticleForCategory(categoryId) {
+    getArticleForCategory (categoryId) {
       let _this = this
       _this.loading = true
       getRequest('/article/categoryId/' + categoryId).then(resp => {
@@ -156,12 +176,15 @@ export default {
         }
       })
     },
-    articleTitleClicked(index) {
+    articleTitleClicked (index) {
       this.activeArticleIndex = index
     }
   },
-  mounted() {
+  mounted () {
     this.initItemName()
+  },
+  components: {
+    TocContent,
   },
 }
 </script>
@@ -184,7 +207,7 @@ export default {
 
 #main.fix-sidebar .sidebar {
   position: fixed;
-  width: 260px;
+  width: 15%;
   /* 上边 | 右边 | 下边 | 左边 */
   padding: 35px 0px 60px 20px;
 }
@@ -235,10 +258,13 @@ a:-webkit-any-link {
 
 .content {
   position: relative;
-  max-width: 700px;
-  margin: 0 auto;
+  max-width: 70%;
+  width: 65%;
+  /* 上边下边 | 左边右边 */
+  margin: 0 15%;
   /*!* 上边 | 右边 | 下边 | 左边 *!*/
-  padding: 35px 0 35px 50px;
+  padding: 35px 0 35px 15px;
+  align-items: center;
 }
 
 .article-title, .article-author, .article-publish-date {
@@ -324,5 +350,36 @@ pre {
   border-radius: 2px;
   position: relative;
 
+}
+
+.toc-content {
+  position: fixed;
+  top: 84px;
+  right: 10px;
+  width: 20%;
+}
+
+.iconfont {
+  width: 16px;
+}
+
+.line-style {
+  display: inline-block;
+  height: 20px;
+  width: 3px;
+  background: transparent;
+}
+
+.line-style--active {
+  background: currentColor;
+}
+
+.aside-divider {
+  position: fixed;
+  left: 16%;
+  background-color: #e3e3e3;
+  width: 2px;
+  top: 0;
+  height: 100%;
 }
 </style>

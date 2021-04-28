@@ -12,7 +12,11 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.0.8",
     "github-markdown-css": "^4.0.0",
+    "lodash.debounce": "^4.0.8",
+    "lodash.throttle": "^4.1.1",
     "mavon-editor": "^2.4.13",
+    "node-sass": "^5.0.0",
+    "uuidv4": "^6.2.7",
     "vue": "^2.6.11",
     "vue-router": "^3.0.1",
     "vuex": "^3.6.2"
@@ -23,6 +27,7 @@
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
+    "sass-loader": "^6.0.6",
     "eslint-plugin-vue": "^6.2.2",
     "vue-template-compiler": "^2.6.11"
   },

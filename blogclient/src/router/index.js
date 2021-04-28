@@ -39,15 +39,15 @@ export default new Router({
       menu_item: false,
       children: [
         {
-          path: '/reading',
-          name: '读书',
-          component: Reading,
-          menu_item: true,
-        },
-        {
           path: '/music_list',
           name: '歌单',
           component: MusicList,
+          menu_item: true,
+        },
+        {
+          path: '/reading',
+          name: '读书',
+          component: Reading,
           menu_item: true,
         }
       ]

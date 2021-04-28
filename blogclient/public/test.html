@@ -5,17 +5,89 @@
   <title>Title</title>
   <link href="test.css" rel="stylesheet">
 </head>
-<body>
-<div class="parent">
-  <div class="child-1">
-    <div class="child">
-      Love vanilla.
-    </div>
-
-    <div class="child">
-      Love hahah.
-    </div>
+<body onload="this.loadFinished()">
+  <div>
+    <h1>这是一级标题</h1>
+    <span>这是一级标题的内容</span>
+    <h2>这是二级标题</h2>
+    <span>这是二级标题的内容</span>
+    <h3>这是三级标题</h3>
+    <span>这是三级标题的内容</span>
   </div>
-</div>
+  <div>
+    <h1>这是一级标题</h1>
+    <span>这是一级标题的内容</span>
+    <h2>这是二级标题</h2>
+    <span>这是二级标题的内容</span>
+    <h3>这是三级标题</h3>
+    <span>这是三级标题的内容</span>
+  </div>
 </body>
+
+<script>
+  import { uuid } from 'uuidv4'
+
+  function generateToc () {
+    let linkList = generateNavTree()
+    let tocContent = ''
+    let parentStart = '<ul>'
+    tocContent.concat(parentStart)
+    for (let itemData in linkList) {
+      let tocLiStart = '\<li>'
+      let tocItem = '<a id="${itemData.id}">${itemData.title}</a>'
+      let tocLiEnd = '<\li>'
+      tocContent.concat(tocLiStart, tocItem, tocLiEnd)
+    }
+    let parentEnd = '</ul>'
+    tocContent.concat(parentEnd)
+    return tocContent
+  }
+
+  function createLinkElement (dom) {
+    let ATTR_NAME = 'navigation_anchor'
+    let id = uuid()
+    let element = document.createElement('a')
+    element.setAttribute('id', id)
+    element.setAttribute(ATTR_NAME, true)
+    dom.parentNode.insertBefore(element, dom)
+    return id
+  }
+
+  function generateNavTree () {
+    let destinate = ['h1', 'h2']
+    let list = []
+    for (let idx in destinate) {
+      let elementList = document.querySelectorAll(destinate[idx])
+      elementList.forEach(element => {
+        if (element.offsetParent === null) return
+        element.__nav_level = idx
+      })
+    }
+    let selector = destinate.join(',')
+    let domList = document.querySelectorAll(selector)
+    for (let element of domList) {
+      if (!element.__nav_level) {
+        continue
+      }
+      let pushList = list
+      while (element.__nav_level > 0) {
+        pushList = pushList.length ? pushList[pushList.length - 1].children : null
+        if (!pushList) break
+        element.__nav_level--
+      }
+      let data = {
+        title: element.textContent,
+        children: [],
+        id: createLinkElement(element)
+      }
+      pushList && pushList.push(data)
+      delete element.__nav_level
+    }
+    return list
+  }
+
+  function loadFinished () {
+    document.write(generateToc())
+  }
+</script>
 </html>

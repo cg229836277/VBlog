@@ -20,7 +20,12 @@
       <div :style="item_style" class="article_grid_item_margin"
            v-on:submit.prevent="gridItemClicked(lastGridItem)" :key="'last'">
         <img class="article_grid_item_img" :src="iconSrc[iconSrc.length - 1]"/>
-        <p class="article_grid_item_title">{{ lastGridItem.item_title }}</p>
+        <p class="article_grid_item_title">
+          <router-link
+              :to="{ name: 'tech_detail', params: { item_name: lastGridItem.item_title, item_id:lastGridItem.item_id }}">
+            {{ lastGridItem.item_title }}
+          </router-link>
+        </p>
         <p class="article_grid_item_detail">{{ lastGridItem.item_detail }}</p>
       </div>
     </section>

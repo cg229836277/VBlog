@@ -48,7 +48,7 @@ export default {
 <style scoped>
 .music-list-parent {
   width: 85%;
-  border: 1px solid slategray;
+  border: 1px solid #ebedef;
   border-radius: 5px;
   display: flex;
   justify-content: center;

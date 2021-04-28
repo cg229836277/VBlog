@@ -45,10 +45,10 @@
           <template v-for="(item,index) in this.$router.options.routes">
             <el-submenu :index="'' + index" :key="index"
                         v-if="item.children && item.children.length > 1 && item.children[0].menu_item"
-                        class="header-el-submenu-life">
+                        class="header-el-submenu">
               <template slot="title">{{ item.name }}</template>
               <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path"
-                            style="background-color: #dbdbdb;">
+                            class="header-el-submenu-child">
                 {{ child.name }}
               </el-menu-item>
             </el-submenu>
@@ -92,10 +92,18 @@ export default {
   height: 100%;
 }
 
-.header-el-submenu-life {
+.header-el-submenu {
   margin-left: 15%;
   margin-right: 15%;
 }
+
+/*.header-el-submenu:active {*/
+/*  background-color: #ACACAC !important;*/
+/*}*/
+
+/*.header-el-submenu-child:hover {*/
+/*  background-color: #ACACAC !important;*/
+/*}*/
 
 #aside_container {
   align-items: center;
