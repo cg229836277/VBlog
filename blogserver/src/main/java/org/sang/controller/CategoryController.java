@@ -6,6 +6,8 @@ import org.sang.dataobject.CategoryDO;
 import org.sang.exception.CRUDResultEnum;
 import org.sang.exception.ServiceException;
 import org.sang.exception.ServiceExceptionEnum;
+import org.sang.ratelimit.Limit;
+import org.sang.ratelimit.LimitType;
 import org.sang.service.ICategoryService;
 import org.sang.vo.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.sang.ratelimit.LimitParas.DEFAULT_COUNT_LIMIT;
+import static org.sang.ratelimit.LimitParas.DEFAULT_TIME_LIMIT;
 
 @RestController
 @RequestMapping(value = "/category")
@@ -23,6 +28,7 @@ public class CategoryController {
     ICategoryService iCategoryService;
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @Limit(key = "category_all", period = DEFAULT_TIME_LIMIT, count = DEFAULT_COUNT_LIMIT, limitType = LimitType.IP)
     public CommonResult<List<CategoryDO>> getCategories() {
         List<CategoryDO> categoryDOList = iCategoryService.getAllCategories();
         if (categoryDOList == null || categoryDOList.size() == 0) {
@@ -33,6 +39,7 @@ public class CategoryController {
     }
 
     @RequestMapping(value = "/{parentName}", method = RequestMethod.GET)
+    @Limit(key = "category_parentName", period = DEFAULT_TIME_LIMIT, count = DEFAULT_COUNT_LIMIT, limitType = LimitType.IP)
     public CommonResult<List<CategoryDO>> getByParentName(@PathVariable String parentName) {
         List<CategoryDO> categoryDOList = iCategoryService.getByParentName(parentName);
         if (categoryDOList == null || categoryDOList.size() == 0) {

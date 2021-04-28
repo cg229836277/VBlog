@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.sang.config.utils.StringUtils;
 import org.sang.dataobject.CategoryDO;
 import org.sang.exception.CRUDResultEnum;
+import org.sang.ratelimit.Limit;
+import org.sang.ratelimit.LimitParas;
+import org.sang.ratelimit.LimitType;
 import org.sang.service.ICategoryService;
 import org.sang.vo.ArticleDataObject;
 import org.sang.exception.ServiceException;
@@ -62,6 +65,7 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
+    @Limit(key = "article_id", period = LimitParas.ARTICLE_TIME_LIMIT, count = LimitParas.ARTICLE_COUNT_LIMIT, limitType = LimitType.IP)
     public CommonResult<ArticleDO> getArticleById(@PathVariable String id) {
         ArticleDO data = iArticleService.getById(id);
         if (data == null) {
@@ -72,6 +76,7 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/{type}", method = RequestMethod.GET)
+    @Limit(key = "article_type", period = LimitParas.ARTICLE_TIME_LIMIT, count = LimitParas.ARTICLE_COUNT_LIMIT, limitType = LimitType.IP)
     public CommonResult<List<ArticleDO>> getArticleByType(@PathVariable String type) {
         List<ArticleDO> data = iArticleService.getByType(type);
         if (data == null) {
@@ -81,6 +86,7 @@ public class ArticleController {
         }
     }
 
+    @Limit(key = "article_title", period = LimitParas.ARTICLE_TIME_LIMIT, count = LimitParas.ARTICLE_COUNT_LIMIT, limitType = LimitType.IP)
     @RequestMapping(value = "/title/{title}", method = RequestMethod.GET)
     public CommonResult<ArticleDO> getArticleByTitle(@PathVariable String title) {
         ArticleDO data = iArticleService.getByTitle(title);
@@ -119,6 +125,7 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
+    @Limit(key = "article_status", period = LimitParas.ARTICLE_TIME_LIMIT, count = LimitParas.ARTICLE_COUNT_LIMIT, limitType = LimitType.IP)
     public CommonResult<ArticleDataObject> getArticleByStatus(String status, String pageIndex, String pageSize) {
         log.info("status:" + status + ",pageIndex:" + pageIndex + ",pageSize:" + pageSize);
         int defaultStatus = ArticleDO.STATUS_ALL;
@@ -136,6 +143,7 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/categoryId/{categoryId}", method = RequestMethod.GET)
+    @Limit(key = "article_categoryId", period = LimitParas.ARTICLE_TIME_LIMIT, count = LimitParas.ARTICLE_COUNT_LIMIT, limitType = LimitType.IP)
     public CommonResult<List<ArticleDO>> getArticleByCategoryId(@PathVariable int categoryId) {
         List<ArticleDO> data = iArticleService.getByCategoryId(categoryId);
         if (data == null) {

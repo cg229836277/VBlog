@@ -26,6 +26,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -73,11 +74,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         // 允许跨域访问的 URL
         List<String> allowedOriginsUrl = new ArrayList<>();
-        allowedOriginsUrl.add("http://localhost:8080");
-        allowedOriginsUrl.add("http://localhost:8082");
-        allowedOriginsUrl.add("http://127.0.0.1:8080");
+        allowedOriginsUrl.add("*");
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
+        config.setAllowedMethods(Arrays.asList("GET", "POST"));
         // 设置允许跨域访问的 URL
         config.setAllowedOrigins(allowedOriginsUrl);
         config.addAllowedHeader("*");
@@ -91,7 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity httpSecurity) throws Exception {
         //"/api/user/register",
         httpSecurity.authorizeRequests()
-                .antMatchers("/category/add", "/category/delete", "/category/delete/ids", "/category/update", "/article/upload", "/article/update").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/category/add", "/api/user/register", "/category/delete", "/category/delete/ids", "/category/update", "/article/upload", "/article/update").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated()
                 .and().formLogin().permitAll()
                 .and().cors().and().csrf().disable();
